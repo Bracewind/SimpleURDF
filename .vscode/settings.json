@@ -1,0 +1,15 @@
+{
+    "restructuredtext.confPath": "",
+    "python.pythonPath": "venv/simpleurdf-N0_-Sw1X-py3.8/bin/python3",
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.nosetestsEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "cSpell.words": [
+        "URDF",
+        "lxml",
+        "simpleurdf"
+    ]
+}
