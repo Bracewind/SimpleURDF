@@ -1,6 +1,6 @@
 import math
-from simpleurdf.urdf2Metamodel.metamodel import (
-    FixedJoint,
+from simpleurdf.urdf2model.basemodel import FixedJointType
+from simpleurdf.urdf2model import (
     MaterialColor,
     Link,
     Mesh,
@@ -8,7 +8,6 @@ from simpleurdf.urdf2Metamodel.metamodel import (
     Visual,
     Model,
     Joint,
-    JointType,
     Pose,
 )
 
@@ -101,63 +100,73 @@ def model():
             left_front,
         ],
         joints=[
-            FixedJoint(
+            Joint(
                 name="base_joint",
                 parent=base_link,
                 child=body_link,
+                jointTypeCharacteristics=FixedJointType(),
             ),
-            FixedJoint(
+            Joint(
                 name="arrow_joint",
                 parent=base_link,
                 child=arrow,
+                jointTypeCharacteristics=FixedJointType(),
             ),
-            FixedJoint(
+            Joint(
                 name="body_laser_joint",
                 parent=body_link,
                 child=laser,
                 pose=Pose(xyz=[0.035, 0, 0.112], rpy=[0, 0, math.pi]),
+                jointTypeCharacteristics=FixedJointType(),
             ),
-            FixedJoint(
+            Joint(
                 name="body_imu_joint",
                 parent=body_link,
                 child=imu,
                 pose=Pose(xyz=[0.025, 0, 0], rpy=[math.pi, 0, math.pi]),
+                jointTypeCharacteristics=FixedJointType(),
             ),
-            FixedJoint(
+            Joint(
                 name="right_rear_leg_base_joint",
                 parent=body_link,
                 child=right_rear.getBaseLink(),
                 pose=pose_right_rear,
+                jointTypeCharacteristics=FixedJointType(),
             ),
-            FixedJoint(
+            Joint(
                 name="right_middle_leg_base_joint",
                 parent=body_link,
                 child=right_middle.getBaseLink(),
                 pose=pose_right_middle,
+                jointTypeCharacteristics=FixedJointType(),
             ),
-            FixedJoint(
+            Joint(
                 name="right_front_leg_base_joint",
                 parent=body_link,
                 child=right_front.getBaseLink(),
                 pose=pose_right_front,
+                jointTypeCharacteristics=FixedJointType(),
             ),
-            FixedJoint(
+            Joint(
                 name="left_rear_leg_base_joint",
                 parent=body_link,
                 child=left_rear.getBaseLink(),
                 pose=pose_left_rear,
+                jointTypeCharacteristics=FixedJointType(),
             ),
-            FixedJoint(
+            Joint(
                 name="left_middle_leg_base_joint",
                 parent=body_link,
                 child=left_middle.getBaseLink(),
                 pose=pose_left_middle,
+                jointTypeCharacteristics=FixedJointType(),
             ),
-            FixedJoint(
+            Joint(
                 name="left_front_leg_base_joint",
                 parent=body_link,
                 child=left_front.getBaseLink(),
                 pose=pose_left_front,
+                jointTypeCharacteristics=FixedJointType(),
             ),
         ],
     )

@@ -1,17 +1,18 @@
-from simpleurdf.urdf2Metamodel import World, Robot, Link, Joint
-from simpleurdf import JointType
+from simpleurdf.urdf2model.basemodel import ContinuousJointType
+from simpleurdf.urdf2model import World, Model, Link
 
 link1 = Link(name="link1")
 link2 = Link(name="link2")
 link3 = Link(name="link3")
 
 World(
-    model=Robot(
+    models=Model(
+        name="testMultipleJoint",
         links=[link1, link2, link3, Link(name="link4")],
         joints=[
             Joint(
                 name="joint1",
-                jointType=JointType.JOINT_CONTINUOUS,
+                jointType=ContinuousJointType(),
                 parent=link1,
                 child=link2,
             ),

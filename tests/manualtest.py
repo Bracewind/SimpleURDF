@@ -1,17 +1,29 @@
 from abc import ABC, abstractmethod
 import os
 import math
+import simpleurdf
+from tests.reference_model.robot_with_one_fixed_joint import RobotWithOneFixedJoint
 
 from lxml import etree
 from lxml.objectify import ElementMaker
 
-from simpleurdf.urdf2Metamodel import Mesh
+from simpleurdf.urdf2model import Mesh
+from simpleurdf import UrdfParser
 
 # import simpleurdf.urdfParser.urdf as urdf
 
 
 e = ElementMaker()
-print(etree.tostring(e.a({"name": "ert"}, *[]), pretty_print=True))
+
+
+def g():
+    return None
+
+
+f = e.link(g())
+
+
+print(etree.tostring(f, pretty_print=True))
 
 
 class ILink(ABC):

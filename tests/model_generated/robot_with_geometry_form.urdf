@@ -1,0 +1,47 @@
+<robot name="test_robot">
+  <link name="link1">
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="3.00 2.00 2.00"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="3.00 2.00 2.00"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="10.0"/>
+      <inertia ixx="6.666666666666666" ixy="0.0" ixz="0.0" iyy="10.833333333333332" iyz="0.0" izz="10.833333333333332"/>
+    </inertial>
+  </link>
+  <link name="link2">
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.5" length="5.0"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.5" length="5.0"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="10.0"/>
+      <inertia ixx="21.458333333333332" ixy="0.0" ixz="0.0" iyy="21.458333333333332" iyz="0.0" izz="1.25"/>
+    </inertial>
+  </link>
+  <joint name="fixed_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="link1"/>
+    <child link="link2"/>
+  </joint>
+</robot>

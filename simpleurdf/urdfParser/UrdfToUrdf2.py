@@ -1,4 +1,4 @@
-from urdf2.urdf2Metamodel.Link import Link
+from urdf2.urdf2model import Link
 from urdf2.urdf2Metamodel.Robot import Robot
 from urdf2.urdf2Metamodel.World import World
 from urdf2.urdf2Metamodel.Joint import Joint
@@ -47,12 +47,13 @@ class UrdfToUrdf2:
         return linkURDF2
 
     def createJoint(self, context, urdfJoint):
-        jointType = JOINT_TYPE_MAPPING[urdfJoint.get('type')]
-        joint = Joint(urdfJoint.get("name"),
-                      jointType,
-                      context[urdfJoint.get('parent')],
-                      context[urdfJoint.get('child')]
-                      )
+        jointType = JOINT_TYPE_MAPPING[urdfJoint.get("type")]
+        joint = Joint(
+            urdfJoint.get("name"),
+            jointType,
+            context[urdfJoint.get("parent")],
+            context[urdfJoint.get("child")],
+        )
         return joint
 
     def jointParentAction(self, context, linkName: str):

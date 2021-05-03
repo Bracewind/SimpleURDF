@@ -195,22 +195,22 @@
   <link name="laser"/>
   <link name="imu"/>
   <joint name="right_rear_coxa_joint" type="revolute">
-    <axis xyz="0.0 0.0 1.0"/>
-    <limit lower="-3.142" upper="3.142" effort="1000.000" velocity="1.000"/>
+    <axis xyz="0.00000 0.00000 1.00000"/>
+    <limit lower="-3.14159" upper="3.14159" effort="1000.00000" velocity="1.00000"/>
     <origin rpy="0.0 0.0 -1.5707963267948966" xyz="0 0 0"/>
     <parent link="right_rear_leg_base"/>
     <child link="right_rear_coxa"/>
   </joint>
   <joint name="right_rear_femur_joint" type="revolute">
-    <axis xyz="0.0 0.0 -1.0"/>
-    <limit lower="-3.142" upper="3.142" effort="1000.000" velocity="1.000"/>
+    <axis xyz="0.00000 0.00000 -1.00000"/>
+    <limit lower="-3.14159" upper="3.14159" effort="1000.00000" velocity="1.00000"/>
     <origin rpy="-1.5707963267948966 1.5707963267948966 0.0" xyz="0.044 0.0 0.0"/>
     <parent link="right_rear_coxa"/>
     <child link="right_rear_femur"/>
   </joint>
   <joint name="right_rear_tibia_joint" type="revolute">
-    <axis xyz="0.0 0.0 1.0"/>
-    <limit lower="-3.142" upper="3.142" effort="1000.000" velocity="1.000"/>
+    <axis xyz="0.00000 0.00000 1.00000"/>
+    <limit lower="-3.14159" upper="3.14159" effort="1000.00000" velocity="1.00000"/>
     <origin rpy="3.141592653589793 0.0 0.0" xyz="0.0 -0.07 0.0"/>
     <parent link="right_rear_femur"/>
     <child link="right_rear_tibia"/>
@@ -221,22 +221,22 @@
     <child link="right_rear_button"/>
   </joint>
   <joint name="right_middle_coxa_joint" type="revolute">
-    <axis xyz="0.0 0.0 1.0"/>
-    <limit lower="-3.142" upper="3.142" effort="1000.000" velocity="1.000"/>
+    <axis xyz="0.00000 0.00000 1.00000"/>
+    <limit lower="-3.14159" upper="3.14159" effort="1000.00000" velocity="1.00000"/>
     <origin rpy="0.0 0.0 -1.5707963267948966" xyz="0 0 0"/>
     <parent link="right_middle_leg_base"/>
     <child link="right_middle_coxa"/>
   </joint>
   <joint name="right_middle_femur_joint" type="revolute">
-    <axis xyz="0.0 0.0 -1.0"/>
-    <limit lower="-3.142" upper="3.142" effort="1000.000" velocity="1.000"/>
+    <axis xyz="0.00000 0.00000 -1.00000"/>
+    <limit lower="-3.14159" upper="3.14159" effort="1000.00000" velocity="1.00000"/>
     <origin rpy="-1.5707963267948966 1.5707963267948966 0.0" xyz="0.044 0.0 0.0"/>
     <parent link="right_middle_coxa"/>
     <child link="right_middle_femur"/>
   </joint>
   <joint name="right_middle_tibia_joint" type="revolute">
-    <axis xyz="0.0 0.0 1.0"/>
-    <limit lower="-3.142" upper="3.142" effort="1000.000" velocity="1.000"/>
+    <axis xyz="0.00000 0.00000 1.00000"/>
+    <limit lower="-3.14159" upper="3.14159" effort="1000.00000" velocity="1.00000"/>
     <origin rpy="3.141592653589793 0.0 0.0" xyz="0.0 -0.07 0.0"/>
     <parent link="right_middle_femur"/>
     <child link="right_middle_tibia"/>
@@ -247,22 +247,22 @@
     <child link="right_middle_button"/>
   </joint>
   <joint name="right_front_coxa_joint" type="revolute">
-    <axis xyz="0.0 0.0 1.0"/>
-    <limit lower="-3.142" upper="3.142" effort="1000.000" velocity="1.000"/>
+    <axis xyz="0.00000 0.00000 1.00000"/>
+    <limit lower="-3.14159" upper="3.14159" effort="1000.00000" velocity="1.00000"/>
     <origin rpy="0.0 0.0 -1.5707963267948966" xyz="0 0 0"/>
     <parent link="right_front_leg_base"/>
     <child link="right_front_coxa"/>
   </joint>
   <joint name="right_front_femur_joint" type="revolute">
-    <axis xyz="0.0 0.0 -1.0"/>
-    <limit lower="-3.142" upper="3.142" effort="1000.000" velocity="1.000"/>
+    <axis xyz="0.00000 0.00000 -1.00000"/>
+    <limit lower="-3.14159" upper="3.14159" effort="1000.00000" velocity="1.00000"/>
     <origin rpy="-1.5707963267948966 1.5707963267948966 0.0" xyz="0.044 0.0 0.0"/>
     <parent link="right_front_coxa"/>
     <child link="right_front_femur"/>
   </joint>
   <joint name="right_front_tibia_joint" type="revolute">
-    <axis xyz="0.0 0.0 1.0"/>
-    <limit lower="-3.142" upper="3.142" effort="1000.000" velocity="1.000"/>
+    <axis xyz="0.00000 0.00000 1.00000"/>
+    <limit lower="-3.14159" upper="3.14159" effort="1000.00000" velocity="1.00000"/>
     <origin rpy="3.141592653589793 0.0 0.0" xyz="0.0 -0.07 0.0"/>
     <parent link="right_front_femur"/>
     <child link="right_front_tibia"/>
@@ -273,22 +273,22 @@
     <child link="right_front_button"/>
   </joint>
   <joint name="left_rear_coxa_joint" type="revolute">
-    <axis xyz="0.0 0.0 1.0"/>
-    <limit lower="-3.142" upper="3.142" effort="1000.000" velocity="1.000"/>
+    <axis xyz="0.00000 0.00000 1.00000"/>
+    <limit lower="-3.14159" upper="3.14159" effort="1000.00000" velocity="1.00000"/>
     <origin rpy="0.0 0.0 1.5707963267948966" xyz="0 0 0"/>
     <parent link="left_rear_leg_base"/>
     <child link="left_rear_coxa"/>
   </joint>
   <joint name="left_rear_femur_joint" type="revolute">
-    <axis xyz="0.0 0.0 1.0"/>
-    <limit lower="-3.142" upper="3.142" effort="1000.000" velocity="1.000"/>
+    <axis xyz="0.00000 0.00000 1.00000"/>
+    <limit lower="-3.14159" upper="3.14159" effort="1000.00000" velocity="1.00000"/>
     <origin rpy="-1.5707963267948966 1.5707963267948966 0.0" xyz="0.044 0.0 0.0"/>
     <parent link="left_rear_coxa"/>
     <child link="left_rear_femur"/>
   </joint>
   <joint name="left_rear_tibia_joint" type="revolute">
-    <axis xyz="0.0 0.0 -1.0"/>
-    <limit lower="-3.142" upper="3.142" effort="1000.000" velocity="1.000"/>
+    <axis xyz="0.00000 0.00000 -1.00000"/>
+    <limit lower="-3.14159" upper="3.14159" effort="1000.00000" velocity="1.00000"/>
     <origin rpy="3.141592653589793 0.0 0.0" xyz="0.0 -0.07 0.0"/>
     <parent link="left_rear_femur"/>
     <child link="left_rear_tibia"/>
@@ -299,22 +299,22 @@
     <child link="left_rear_button"/>
   </joint>
   <joint name="left_middle_coxa_joint" type="revolute">
-    <axis xyz="0.0 0.0 1.0"/>
-    <limit lower="-3.142" upper="3.142" effort="1000.000" velocity="1.000"/>
+    <axis xyz="0.00000 0.00000 1.00000"/>
+    <limit lower="-3.14159" upper="3.14159" effort="1000.00000" velocity="1.00000"/>
     <origin rpy="0.0 0.0 1.5707963267948966" xyz="0 0 0"/>
     <parent link="left_middle_leg_base"/>
     <child link="left_middle_coxa"/>
   </joint>
   <joint name="left_middle_femur_joint" type="revolute">
-    <axis xyz="0.0 0.0 1.0"/>
-    <limit lower="-3.142" upper="3.142" effort="1000.000" velocity="1.000"/>
+    <axis xyz="0.00000 0.00000 1.00000"/>
+    <limit lower="-3.14159" upper="3.14159" effort="1000.00000" velocity="1.00000"/>
     <origin rpy="-1.5707963267948966 1.5707963267948966 0.0" xyz="0.044 0.0 0.0"/>
     <parent link="left_middle_coxa"/>
     <child link="left_middle_femur"/>
   </joint>
   <joint name="left_middle_tibia_joint" type="revolute">
-    <axis xyz="0.0 0.0 -1.0"/>
-    <limit lower="-3.142" upper="3.142" effort="1000.000" velocity="1.000"/>
+    <axis xyz="0.00000 0.00000 -1.00000"/>
+    <limit lower="-3.14159" upper="3.14159" effort="1000.00000" velocity="1.00000"/>
     <origin rpy="3.141592653589793 0.0 0.0" xyz="0.0 -0.07 0.0"/>
     <parent link="left_middle_femur"/>
     <child link="left_middle_tibia"/>
@@ -325,22 +325,22 @@
     <child link="left_middle_button"/>
   </joint>
   <joint name="left_front_coxa_joint" type="revolute">
-    <axis xyz="0.0 0.0 1.0"/>
-    <limit lower="-3.142" upper="3.142" effort="1000.000" velocity="1.000"/>
+    <axis xyz="0.00000 0.00000 1.00000"/>
+    <limit lower="-3.14159" upper="3.14159" effort="1000.00000" velocity="1.00000"/>
     <origin rpy="0.0 0.0 1.5707963267948966" xyz="0 0 0"/>
     <parent link="left_front_leg_base"/>
     <child link="left_front_coxa"/>
   </joint>
   <joint name="left_front_femur_joint" type="revolute">
-    <axis xyz="0.0 0.0 1.0"/>
-    <limit lower="-3.142" upper="3.142" effort="1000.000" velocity="1.000"/>
+    <axis xyz="0.00000 0.00000 1.00000"/>
+    <limit lower="-3.14159" upper="3.14159" effort="1000.00000" velocity="1.00000"/>
     <origin rpy="-1.5707963267948966 1.5707963267948966 0.0" xyz="0.044 0.0 0.0"/>
     <parent link="left_front_coxa"/>
     <child link="left_front_femur"/>
   </joint>
   <joint name="left_front_tibia_joint" type="revolute">
-    <axis xyz="0.0 0.0 -1.0"/>
-    <limit lower="-3.142" upper="3.142" effort="1000.000" velocity="1.000"/>
+    <axis xyz="0.00000 0.00000 -1.00000"/>
+    <limit lower="-3.14159" upper="3.14159" effort="1000.00000" velocity="1.00000"/>
     <origin rpy="3.141592653589793 0.0 0.0" xyz="0.0 -0.07 0.0"/>
     <parent link="left_front_femur"/>
     <child link="left_front_tibia"/>

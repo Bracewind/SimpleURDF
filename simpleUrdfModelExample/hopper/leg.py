@@ -1,14 +1,11 @@
 import math
-from simpleurdf.urdf2Metamodel.metamodel import (
-    Axis,
-    FixedJoint,
+from simpleurdf.urdf2model.basemodel import FixedJointType, RevoluteJointType
+from simpleurdf.urdf2model import (
     Joint,
-    JointType,
     Link,
     Mesh,
     Model,
     Pose,
-    RevoluteJoint,
     Visual,
     Limit,
 )
@@ -65,49 +62,50 @@ class Leg(Model):
 
         self._links = [self.legBase, coxa, femur, tibia, button]
         self._joints = [
-            RevoluteJoint(
+            Joint(
                 name=f"{sideName}_{positionName}_coxa_joint",
                 pose=Pose(rpy=[0.0, 0.0, angle]),
                 parent=self.legBase,
                 child=coxa,
-                axis=Axis(
-                    xyz=[0.0, 0.0, 1.0],
+                jointTypeCharacteristics=RevoluteJointType(
+                    rotationAxis=[0.0, 0.0, 1.0],
                     limit=Limit(
                         lower=-math.pi, upper=math.pi, effort=1000.0, velocity=1
                     ),
                 ),
             ),
-            RevoluteJoint(
+            Joint(
                 name=f"{sideName}_{positionName}_femur_joint",
                 pose=Pose(
                     xyz=[coxa_length, 0.0, 0.0], rpy=[-math.pi / 2, math.pi / 2, 0.0]
                 ),
                 parent=coxa,
                 child=femur,
-                axis=Axis(
-                    xyz=[0.0, 0.0, -axis],
+                jointTypeCharacteristics=RevoluteJointType(
+                    rotationAxis=[0.0, 0.0, -axis],
                     limit=Limit(
                         lower=-math.pi, upper=math.pi, effort=1000.0, velocity=1
                     ),
                 ),
             ),
-            RevoluteJoint(
+            Joint(
                 name=f"{sideName}_{positionName}_tibia_joint",
                 pose=Pose(xyz=[0.0, -femur_length, 0.0], rpy=[math.pi, 0.0, 0.0]),
                 parent=femur,
                 child=tibia,
-                axis=Axis(
-                    xyz=[0.0, 0.0, axis],
+                jointTypeCharacteristics=RevoluteJointType(
+                    rotationAxis=[0.0, 0.0, axis],
                     limit=Limit(
                         lower=-math.pi, upper=math.pi, effort=1000.0, velocity=1
                     ),
                 ),
             ),
-            FixedJoint(
+            Joint(
                 name=f"{sideName}_{positionName}_tibia_button",
                 pose=Pose(xyz=[tibia_length, 0.0, 0.0]),
                 parent=tibia,
                 child=button,
+                jointTypeCharacteristics=FixedJointType(),
             ),
         ]
 

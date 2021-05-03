@@ -1,4 +1,3 @@
-from simpleurdf.urdf2Metamodel import World
 import sys
 from typing import Union
 
@@ -6,7 +5,7 @@ from typing import Union
 # from .UrdfToUrdf2 import UrdfToUrdf2
 from .urdf2_to_urdf import Urdf2ToUrdf
 
-from simpleurdf.urdf2Metamodel.metamodel import Model, World
+from simpleurdf.urdf2model import Model, World
 
 from lxml import etree, objectify
 import simpleurdf.urdfParser.urdf as urdf
@@ -28,7 +27,7 @@ class UrdfParser:
 
     def createURDFString(self, robot) -> str:
         treeRobot = Urdf2ToUrdf().createRobot(robot)
-        return etree.tostring(treeRobot, pretty_print=True)
+        return etree.tostring(treeRobot, pretty_print=True, encoding=str)
         # world = urdfSerializer.createWorld(world)
         # etree.indent(world)
         # etree.ElementTree(world).write(open(pathToFile, "wb"))
@@ -36,5 +35,5 @@ class UrdfParser:
     def createURDFFile(self, robot, pathToFile):
         urdfRobot = self.createURDFString(robot)
         a = type(urdfRobot)
-        with open(pathToFile, "wb") as file:
+        with open(pathToFile, "w") as file:
             file.write(urdfRobot)

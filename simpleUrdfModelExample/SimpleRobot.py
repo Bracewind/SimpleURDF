@@ -1,17 +1,14 @@
-from urdf2 import World, Robot, Link
+from simpleurdf.urdf2model import World, Model, Link
 
 link1 = Link(name="link1")
 link2 = Link(name="link2")
 
 
-def model():
+class model:
     return World(
-        model=Robot(
+        models=Model(
             name="Robot1",
-            links=[link1,
-                   link2,
-                   Link(name="link3"),
-                   Link(name="link4")],
-            joints=[]
+            links=[link1, link2, Link(name="link3"), Link(name="link4")],
+            joints=[],
         )
     )
