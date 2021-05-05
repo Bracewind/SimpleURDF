@@ -4,8 +4,8 @@
     sandbox: true
     pipeline-scm:
       scm:
-        - hg:
-            url: http://hg.example.org/test_job
+        - git:
+            url: file:///home/project
             clean: true
       script-path: Jenkinsfile
       lightweight-checkout: true
