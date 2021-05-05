@@ -1,6 +1,11 @@
 from simpleurdf.urdf2model import metamodel
 from simpleurdf.urdf2model.basemodel import IInertial, Inertial
-from simpleurdf.urdf2model.metamodel import ICollision, IGeometryBox
+from simpleurdf.urdf2model.metamodel import (
+    ICollision,
+    IContinuousJointType,
+    IGeometryBox,
+    IPrismaticJointType,
+)
 from lxml.builder import ElementMaker
 from lxml.etree import ElementTree
 
@@ -37,6 +42,8 @@ def _createNothingIfNullDecorator(method):
 class Urdf2ToUrdf:
     URDF_JOINT_MAPPING = {
         IFixedJointType.__name__: "fixed",
+        IContinuousJointType.__name__: "continuous",
+        IPrismaticJointType.__name__: "prismatic",
         IRevoluteJointType.__name__: "revolute",
     }
 
@@ -134,12 +141,12 @@ class Urdf2ToUrdf:
     def createMesh(self, shape: IMesh):
         x_scale, y_scale, z_scale = shape.scale
         return self.MESH(
-            {"filename": shape.uri, "scale": f"{x_scale} {y_scale} {z_scale}"}
+            {"filename": shape.uri, "scale": f"{x_scale:g} {y_scale:g} {z_scale:g}"}
         )
 
     def createBox(self, shape: IGeometryBox):
         width, depth, length = shape.size
-        return self.BOX({"size": f"{width:.2f} {depth:.2f} {length:.2f}"})
+        return self.BOX({"size": f"{width:g} {depth:g} {length:g}"})
 
     def createCylinder(self, shape: IGeometryCylinder):
         return self.CYLINDER({"radius": str(shape.radius), "length": str(shape.length)})
@@ -152,15 +159,15 @@ class Urdf2ToUrdf:
         ixx, ixy, ixz, iyy, iyz, izz = inertial.inertia
         return self.INERTIAL(
             self.createPose(inertial.pose),
-            self.MASS({"value": str(inertial.mass)}),
+            self.MASS({"value": f"{inertial.mass:g}"}),
             self.INERTIA(
                 {
-                    "ixx": str(ixx),
-                    "ixy": str(ixy),
-                    "ixz": str(ixz),
-                    "iyy": str(iyy),
-                    "iyz": str(iyz),
-                    "izz": str(izz),
+                    "ixx": f"{ixx:g}",
+                    "ixy": f"{ixy:g}",
+                    "ixz": f"{ixz:g}",
+                    "iyy": f"{iyy:g}",
+                    "iyz": f"{iyz:g}",
+                    "izz": f"{izz:g}",
                 }
             ),
         )
@@ -170,6 +177,13 @@ class Urdf2ToUrdf:
         # Used to add to the xml axis and limit if it makes sense for the joint
         switcher = {
             IFixedJointType.__name__: lambda: [],
+            IPrismaticJointType.__name__: lambda: [
+                self.createAxis(joint.jointTypeCharacteristics.translationAxis),
+                self.createLimit(joint.jointTypeCharacteristics.limit),
+            ],
+            IContinuousJointType.__name__: lambda: [
+                self.createAxis(joint.jointTypeCharacteristics.rotationAxis)
+            ],
             IRevoluteJointType.__name__: lambda: [
                 self.createAxis(joint.jointTypeCharacteristics.rotationAxis),
                 self.createLimit(joint.jointTypeCharacteristics.limit),
@@ -191,14 +205,14 @@ class Urdf2ToUrdf:
 
     def createAxis(self, axis: List[float]):
         x, y, z = axis
-        return self.AXIS({"xyz": f"{x:.5f} {y:.5f} {z:.5f}"})
+        return self.AXIS({"xyz": f"{x:g} {y:g} {z:g}"})
 
     def createLimit(self, limit: ILimit):
         return self.LIMIT(
             {
-                "lower": f"{limit.lower:.5f}",
-                "upper": f"{limit.upper:.5f}",
-                "effort": f"{limit.effort:.5f}",
-                "velocity": f"{limit.velocity:.5f}",
+                "lower": f"{limit.lower:g}",
+                "upper": f"{limit.upper:g}",
+                "effort": f"{limit.effort:g}",
+                "velocity": f"{limit.velocity:g}",
             }
         )

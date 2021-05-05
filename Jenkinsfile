@@ -1,11 +1,18 @@
 pipeline{
-    agent any
+    agent { dockerfile true }
 
     stages{
         stage("Build"){
             steps{
-                echo "========executing A========"
+            echo "========installing packages========"
+                poetry install
             }
+        }
+        stage('Test'){
+            steps {
+                echo "========executing tests========"
+                pytest
+            } 
             post{
                 always{
                     echo "========always========"

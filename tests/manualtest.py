@@ -25,6 +25,16 @@ f = e.link(g())
 
 print(etree.tostring(f, pretty_print=True))
 
+import subprocess
+
+cmdlst = ["source", "/opt/ros/foxy/setup.bash"]
+proc = subprocess.Popen(cmdlst, stdout=subprocess.PIPE)
+stdout_value, stderr_value = proc.communicate()
+
+cmdlst2 = ["ros2", "pkg", "lst"]
+proc = subprocess.Popen(cmdlst, stdout=subprocess.PIPE)
+stdout_value, stderr_value = proc.communicate()
+
 
 class ILink(ABC):
     @property

@@ -5,8 +5,8 @@
   <link name="link3"/>
   <link name="link4"/>
   <joint name="fixed_joint" type="revolute">
-    <axis xyz="0.00000 1.00000 0.00000"/>
-    <limit lower="-3.14159" upper="3.14159" effort="1000.00000" velocity="1.00000"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-3.14159" upper="3.14159" effort="1000" velocity="1"/>
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <parent link="link1"/>
     <child link="link2"/>
