@@ -124,7 +124,7 @@
     <child link="hokuyo_link"/>
   </joint>
   <joint name="camera_joint" type="fixed">
-    <origin rpy="0 0 0" xyz="&lt;simpleurdf.urdf2model.basemodel.Box object at 0x7f82031e0730&gt; 0.0 0.9"/>
+    <origin rpy="0 0 0" xyz="&lt;simpleurdf.urdf2model.basemodel.Box object at 0x7f2973715580&gt; 0.0 0.9"/>
     <parent link="link3"/>
     <child link="camera_link"/>
   </joint>
