@@ -1,10 +1,11 @@
 pipeline{
-    agent { dockerfile {filename 'Dockerfile' args '-it --entrypoint=/bin/bash'}}
+    agent { dockerfile {filename 'Dockerfile'}}
 
     stages{
         stage("Build"){
             steps{
             echo "========installing packages========"
+                sh "echo hello"
             }
         }
         stage('Test'){
