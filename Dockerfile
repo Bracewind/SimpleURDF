@@ -12,4 +12,4 @@ RUN pip install poetry
 COPY . /home/project
 WORKDIR /home/project
 RUN poetry install
-ENTRYPOINT ["tail", "-f", "/dev/null"]
+ENTRYPOINT ["/bin/bash"]
