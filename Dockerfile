@@ -9,3 +9,6 @@ ENV PATH="$VENV_PATH/bin:$PATH"
 
 RUN pip install poetry
 RUN pip install pytest
+
+COPY . /home/project
+RUN poetry install
