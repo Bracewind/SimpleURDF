@@ -11,4 +11,6 @@ RUN pip install poetry
 RUN pip install pytest
 
 COPY . /home/project
+WORKDIR /home/project
+
 RUN poetry install
