@@ -1,5 +1,5 @@
 pipeline{
-    agent { dockerfile true }
+    agent { dockerfile {filename 'Dockerfile' args '-it --entrypoint=/bin/bash'}}
 
     stages{
         stage("Build"){
