@@ -5,7 +5,7 @@ pipeline{
         stage("Build"){
             steps{
             echo "========installing packages========"
-                sh "echo hello"
+                sh "poetry install"
             }
         }
         stage('Test'){
