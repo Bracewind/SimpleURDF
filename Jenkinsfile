@@ -11,6 +11,7 @@ pipeline{
         stage('Test'){
             steps {
                 echo "========executing tests========"
+                sh "pytest"
             } 
             post{
                 always{
