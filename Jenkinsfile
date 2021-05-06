@@ -5,7 +5,6 @@ pipeline{
         stage("Build"){
             steps{
             echo "========installing packages========"
-                poetry install
             }
         }
         stage('Test'){
