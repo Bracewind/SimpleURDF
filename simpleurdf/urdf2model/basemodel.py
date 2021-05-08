@@ -1,26 +1,31 @@
-from abc import abstractmethod
+from __future__ import annotations
+from abc import ABC, abstractmethod
+from typing import List, Optional, Union, Tuple, cast
 import math
-from typing import List, Optional
+
+from simpleurdf.utils.python_extension import switch_case, case
 
 from .metamodel import (
-    IContinuousJointType,
-    MetamodelComponent,
-    IMesh,
-    IGeometryBox,
-    Pose,
-    IFixedJointType,
-    IRevoluteJointType,
-    IJoint,
-    IJointType,
-    IInertial,
-    ILink,
-    IMaterial,
-    IVisual,
-    IGeometryCylinder,
-    ILimit,
-    IModel,
-    IDynamics,
-    ICollision,
+  ClassicalMaterialModel,
+  CollisionModel,
+  ContinuousJointTypeModel,
+  DynamicsModel,
+  FixedJointTypeModel,
+  Geometry,
+  GeometryBoxModel,
+  GeometryCylinderModel,
+  Inertia,
+  InertialModel,
+  JointModel,
+  JointTypeModel,
+  LimitModel,
+  LinkModel,
+  MeshModel,
+  ModelModel,
+  Pose,
+  RevoluteJointTypeModel,
+  VisualModel,
+  XYZ,
 )
 
 PARENT = "parent"
@@ -33,29 +38,14 @@ NO_EFFORT = -1
 NO_VELOCITY_LIMIT = math.inf
 
 
-class Mesh(IMesh):
-    def __init__(self, uri, scale: List[float] = [1.0, 1.0, 1.0]):
-        super().__init__()
-        self._uri = uri
-        self._scale = scale
-
-    @property
-    def uri(self):
-        return self._uri
-
-    @property
-    def scale(self):
-        return self._scale
+class Mesh(MeshModel):
+    def __init__(self, uri, scale: XYZ = XYZ(1.0, 1.0, 1.0)):
+        super().__init__(uri, scale)
 
 
-class GeometryBox(IGeometryBox):
-    def __init__(self, size: List[float] = [1.0, 1.0, 1.0]):
-        super().__init__()
-        self._size = size
-
-    @property
-    def size(self):
-        return self._size
+class GeometryBox(GeometryBoxModel):
+    def __init__(self, size: XYZ = XYZ(1.0, 1.0, 1.0)):
+        super().__init__(size)
 
 
 class Capsule:
@@ -69,305 +59,193 @@ class Sphere:
         self.radius = radius
 
 
-class GeometryCylinder(IGeometryCylinder):
+class GeometryCylinder(GeometryCylinderModel):
     def __init__(self, radius: float = 1.0, length: float = 1.0):
-        super().__init__()
-        self._radius = radius
-        self._length = length
-
-    @property
-    def radius(self) -> float:
-        return self._radius
-
-    @property
-    def length(self) -> float:
-        return self._length
+        super().__init__(radius, length)
 
 
-class Inertial(IInertial):
-    def __init__(self, pose: Pose, mass: float, inertia: List[float]) -> None:
-        self._pose = pose
-        self._mass = mass
-        self._inertia = inertia
-
-    @property
-    def pose(self) -> Pose:
-        return self._pose
-
-    @property
-    def mass(self) -> float:
-        return self._mass
-
-    @property
-    def inertia(self) -> List[float]:
-        return self._inertia
+class Inertial(InertialModel):
+    def __init__(self, pose: Pose, mass: float, inertia: Inertia) -> None:
+        super().__init__(pose, mass, inertia)
 
 
-DEFAULT_INERTIAL = Inertial(Pose(), 1, [1, 0, 0, 1, 0, 1])
+class InertialCylinder(Inertial):
+    def __init__(self,
+                 radius: float = 1.0,
+                 length: float = 1.0,
+                 pose: Pose = Pose(),
+                 mass: float = 1.) -> None:
+
+        ixx = 1 / 12 * mass * (3 * radius**2 + length**2)
+        iyy = ixx
+        izz = 1 / 2 * mass * radius**2
+        super().__init__(pose, mass, Inertia(ixx, 0.0, 0.0, iyy, 0.0, izz))
 
 
-class MaterialColor(IMaterial):
+class InertialBox(Inertial):
+    def __init__(self,
+                 size: XYZ = XYZ(1.0, 1.0, 1.0),
+                 pose: Pose = Pose(),
+                 mass: float = 1.) -> None:
+
+        width, height, depth = size
+        ixx = 1 / 12 * mass * (height**2 + depth**2)
+        iyy = 1 / 12 * mass * (width**2 + depth**2)
+        izz = 1 / 12 * mass * (width**2 + height**2)
+        super().__init__(pose, mass, Inertia(ixx, 0.0, 0.0, iyy, 0.0, izz))
+
+
+DEFAULT_INERTIAL = Inertial(Pose(), 1, Inertia(1, 0, 0, 1, 0, 1))
+
+
+class MaterialColor(ClassicalMaterialModel):
     def __init__(
-        self,
-        name,
-        ambient=[0, 0, 0, 0],
-        diffuse=[0, 0, 0, 0],
-        specular=[0, 0, 0, 0],
-        emissive=[0, 0, 0, 0],
+      self,
+      name,
+      ambient=[0, 0, 0, 0],
+      diffuse=[0, 0, 0, 0],
+      specular=[0, 0, 0, 0],
+      emissive=[0, 0, 0, 0],
     ):
-        self._ambient = ambient
-        self._diffuse = diffuse
-        self._specular = specular
-        self._emissive = emissive
-        self._name = name
-
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def ambient(self):
-        return self._ambient
-
-    @property
-    def diffuse(self):
-        return self._diffuse
-
-    @property
-    def specular(self):
-        return self._specular
-
-    @property
-    def emissive(self):
-        return self._emissive
+        super().__init__(name, ambient, diffuse, specular, emissive)
 
 
 white = MaterialColor(name="white", ambient=[0, 0, 0, 1])
 
 
-class Visual(IVisual):
-    def __init__(self, geometry, pose=Pose(), material=white, parent_frame=PARENT):
-        self._pose = pose
-        self._parent_frame = parent_frame
-        self._material = material
-        self._geometry = geometry
-
-    @property
-    def geometry(self):
-        return self._geometry
-
-    @property
-    def pose(self):
-        return self._pose
-
-    @property
-    def material(self):
-        return self._material
-
-    @property
-    def parent_frame(self):
-        return self._parent_frame
+class Visual(VisualModel):
+    def __init__(self,
+                 geometry: Geometry,
+                 pose=Pose(),
+                 material=white,
+                 parent_frame=PARENT):
+        super().__init__(geometry, material, pose)
 
 
-class Collision(ICollision):
+class Collision(CollisionModel):
     def __init__(self, geometry, pose=Pose()) -> None:
-        super().__init__()
-        self._geometry = geometry
-        self._pose = pose
-
-    @property
-    def geometry(self):
-        return self._geometry
-
-    @property
-    def pose(self):
-        return self._pose
+        super().__init__(geometry, pose)
 
 
-class Limit(ILimit):
+class CollisionBox(Collision):
+    def __init__(self, geometry, pose) -> None:
+        super().__init__(geometry, pose=pose)
+
+
+class Limit(LimitModel):
     def __init__(
-        self,
-        lower=LOWER_LIMIT,
-        upper=UPPER_LIMIT,
-        effort=NO_EFFORT,
-        velocity=NO_VELOCITY_LIMIT,
+      self,
+      lower=LOWER_LIMIT,
+      upper=UPPER_LIMIT,
+      effort=NO_EFFORT,
+      velocity=NO_VELOCITY_LIMIT,
     ):
-        self._lower = lower
-        self._upper = upper
-        self._effort = effort
-        self._velocity = velocity
-
-    @property
-    def lower(self):
-        return self._lower
-
-    @property
-    def upper(self):
-        return self._upper
-
-    @property
-    def effort(self):
-        return self._effort
-
-    @property
-    def velocity(self):
-        return self._velocity
+        super().__init__(lower, upper, effort, velocity)
 
 
-class Dynamics(IDynamics):
+class Dynamics(DynamicsModel):
     def __init__(self, damping=0.0) -> None:
-        super().__init__()
-        self._damping = damping
-
-    @property
-    def damping(self):
-        return super().damping
+        super().__init__(damping)
 
 
-# region link
+# region Link
 
 
-class Link(ILink):
+class Link:
     def __init__(
-        self,
-        name: str,
-        visuals: List[Visual] = [],
-        collision=None,
-        inertial=None,
-        pose: Pose = Pose(),
-        parent_frame=PARENT,
+      self,
+      name: str,
+      collision=None,
+      visuals: List[VisualModel] = [],
+      inertial=None,
+      joints: List[Joint] = [],
+      pose: Pose = Pose(),
+      parent_frame=PARENT,
     ):
-        self._name = name
-        self.pose = pose
-        self._inertial = inertial
-        self._visuals = visuals
-        self._collision = collision
+        self.link_model = LinkModel(name, collision, visuals, inertial, pose)
+        self.joints = joints
+        for joint in self.joints:
+            joint.set_parent(self)
 
-    @property
-    def name(self) -> str:
-        return self._name
+    def set_parent(self, parent):
+        self.parent_node = parent
 
-    @property
-    def visuals(self) -> List[Visual]:
-        return self._visuals
-
-    @property
-    def inertial(self) -> Optional[Inertial]:
-        return self._inertial
-
-    @property
-    def collision(self) -> Optional[ICollision]:
-        return self._collision
-
-    def __str__(self) -> str:
-        return self._name
+    def build(self):
+        for joint in self.joints:
+            joint.build()
 
 
-class Cylinder(ILink):
+class Cylinder(Link):
+    """ """
     def __init__(
-        self,
-        name,
-        radius: float,
-        length: float,
-        mass: float = 1,
-        pose=Pose(),
-        collision_pose=Pose(),
+      self,
+      name,
+      radius: float,
+      length: float,
+      mass: float = 1,
+      joints: List[Joint] = [],
+      pose=Pose(),
+      collision_pose: Optional[Pose] = None,
     ):
-        super().__init__()
+
         self._name = name
         self._radius = float(radius)
         self._length = float(length)
         self._mass = float(mass)
         self._pose = pose
 
-        geometryCylinder = GeometryCylinder(self._radius, self._length)
+        geometry_cylinder = GeometryCylinder(self._radius, self._length)
 
-        if pose != Pose():
-            if collision_pose != Pose():
-                self._collision = Collision(geometryCylinder, collision_pose)
-            else:
-                self._collision = Collision(geometryCylinder, pose)
+        if collision_pose is not None:
+            collision = Collision(geometry_cylinder, collision_pose)
+        else:
+            collision = Collision(geometry_cylinder, pose)
 
-        self._visuals = [Visual(geometryCylinder, self._pose)]
+        visuals: List[VisualModel] = [Visual(geometry_cylinder, self._pose)]
 
-        ixx = 1 / 12 * self._mass * (3 * self._radius ** 2 + self._length ** 2)
-        iyy = ixx
-        izz = 1 / 2 * self._mass * self._radius ** 2
-        self._inertial = Inertial(
-            self._pose, self._mass, [ixx, 0.0, 0.0, iyy, 0.0, izz]
-        )
+        inertial = InertialCylinder(self._radius,
+                                    self._length,
+                                    self._pose,
+                                    self._mass)
 
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def visuals(self):
-        return self._visuals
-
-    @property
-    def inertial(self):
-        return self._inertial
-
-    @property
-    def collision(self) -> ICollision:
-        return self._collision
+        super().__init__(name, collision, visuals, inertial, joints, pose)
 
 
-class Box(ILink):
+class Box(Link):
     def __init__(
-        self,
-        name,
-        material,
-        width: float = 1.0,
-        depth: float = 1.0,
-        height: float = 1.0,
-        mass: float = 1.0,
-        pose=Pose(),
-        collision_pose=Pose(),
+      self,
+      name,
+      material,
+      width: float = 1.0,
+      depth: float = 1.0,
+      height: float = 1.0,
+      mass: float = 1.0,
+      joints: List[Joint] = [],
+      pose=Pose(),
+      collision_pose: Optional[Pose] = None,
     ):
-        super().__init__()
+
         self._name = name
-        self._size = [float(width), float(height), float(depth)]
+        self._size = XYZ(float(width), float(height), float(depth))
         self._mass = float(mass)
         self._pose = pose
 
-        # if pose was set
-        if pose != Pose():
-            # if collection_pose was set
-            if collision_pose != Pose():
-                self._collision = Collision(GeometryBox(self._size), collision_pose)
-            # if not set, put pose of visual
-            else:
-                self._collision = Collision(GeometryBox(self._size), pose)
+        # if collection_pose was set
+        if collision_pose is not None:
+            collision = Collision(GeometryBox(self._size), collision_pose)
+        # if not set, put pose of visual
+        else:
+            collision = Collision(GeometryBox(self._size), pose)
 
         # create visuals
-        self._visuals = [Visual(GeometryBox(self._size), self._pose)]
+        visuals: List[VisualModel] = [
+          Visual(GeometryBox(self._size), self._pose)
+        ]
 
         # create inertials
-        width, height, depth = self._size
-        ixx = 1 / 12 * self._mass * (height ** 2 + depth ** 2)
-        iyy = 1 / 12 * self._mass * (width ** 2 + depth ** 2)
-        izz = 1 / 12 * self._mass * (width ** 2 + height ** 2)
-        self._inertial = Inertial(
-            self._pose, self._mass, [ixx, 0.0, 0.0, iyy, 0.0, izz]
-        )
+        inertial = InertialBox(self._size, self._pose, self._mass)
 
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def collision(self) -> ICollision:
-        return self._collision
-
-    @property
-    def visuals(self):
-        return self._visuals
-
-    @property
-    def inertial(self):
-        return self._inertial
+        super().__init__(name, collision, visuals, inertial, joints, pose)
 
 
 # endregion
@@ -375,128 +253,157 @@ class Box(ILink):
 # region joints
 
 
-class FixedJointType(IFixedJointType):
-    def __init__(self) -> None:
-        super().__init__()
-
-    @property
-    def dynamics(self):
-        return None
+class JointType(ABC):
+    @abstractmethod
+    def build(self) -> JointTypeModel:
+        pass
 
 
-class ContinuousJointType(IContinuousJointType):
-    def __init__(self, rotationAxis: List[float], jointPhysic=Dynamics()):
-        super().__init__()
-        self._jointPhysic = jointPhysic
-        self._rotationAxis = rotationAxis
+class FixedJointType(JointType):
+    def __init__(self, dynamics: DynamicsModel) -> None:
+        self.joint_type = FixedJointTypeModel(dynamics)
 
-    @property
-    def dynamics(self):
-        return self._jointPhysic
-
-    @property
-    def rotationAxis(self) -> List[float]:
-        return self._rotationAxis
+    def build(self) -> FixedJointTypeModel:
+        return self.joint_type
 
 
-class RevoluteJointType(IRevoluteJointType):
-    def __init__(self, rotationAxis, limit, jointPhysic=Dynamics()):
-        super().__init__()
-        self._jointPhysic = jointPhysic
-        self._rotationAxis = rotationAxis
-        self._limit = limit
+class ContinuousJointType(JointType):
+    def __init__(self, rotation_axis: XYZ, joint_physic=Dynamics()):
+        self.joint_type = ContinuousJointTypeModel(joint_physic, rotation_axis)
 
-    @property
-    def dynamics(self):
-        return self._jointPhysic
-
-    @property
-    def rotationAxis(self) -> List[float]:
-        return self._rotationAxis
-
-    @property
-    def limit(self) -> ILimit:
-        return self._limit
+    def build(self) -> ContinuousJointTypeModel:
+        return self.joint_type
 
 
-class Joint(IJoint):
+class RevoluteJointType(JointType):
+    def __init__(self,
+                 rotation_axis: XYZ,
+                 limit: LimitModel,
+                 joint_physic=Dynamics()):
+        self.joint_type = RevoluteJointTypeModel(
+          joint_physic,
+          rotation_axis,
+          limit,
+        )
+
+    def build(self) -> RevoluteJointTypeModel:
+        return self.joint_type
+
+
+class Joint:
     def __init__(
-        self,
-        name: str,
-        parent,
-        child,
-        jointTypeCharacteristics: IJointType,
-        pose=Pose(),
-        parent_frame=PARENT,
+      self,
+      name: str,
+      child: Union[Tuple[Model, int], Link],
+      joint_type_characteristics: JointType,
+      pose=Pose(),
+      parent_frame=PARENT,
     ):
-        self._name = name
-        self._pose = pose
-        self._parent = parent
-        self._child = child
-        self._jointTypeCharacteristics = jointTypeCharacteristics
+        self._name_param = name
+        self._pose_param = pose
+        self.child_node = child
+        self._joint_type_characteristics_param = joint_type_characteristics
+        self.parent_node = None
+        self.joint_model = None
 
-    @property
-    def name(self) -> str:
-        return self._name
+    def set_parent(self, parent: Union[Tuple[Model, int], Link]):
+        self.parent_node = parent
 
-    @property
-    def pose(self):
-        return self._pose
+    def get_node_link(self, node) -> Link:
+        def case_link(link: Link) -> Link:
+            return link
 
-    @property
-    def parent(self) -> Link:
-        return self._parent
+        def case_model(model: Tuple[Model, int]) -> Link:
+            return model[0].get_link(model[1])
 
-    @property
-    def child(self) -> Link:
-        return self._child
+        def default(value_seen) -> Link:
+            raise Exception(
+              f"the node has an invalid type {value_seen.__class__}")
 
-    @property
-    def jointTypeCharacteristics(self) -> IJointType:
-        return self._jointTypeCharacteristics
+        return switch_case(node, {
+          tuple: case_model, Link: case_link, None: default
+        })
+
+    def next(self):
+        return self.child_node
+
+    def build(self) -> JointModel:
+
+        # from child_node, extract link or model in variable child_model_or_link
+        assert self.child_node is not None
+        child_model_or_link = self.child_node
+        if isinstance(self.child_node, tuple):
+            child_model_or_link = self.child_node[0]
+        assert (isinstance(child_model_or_link, Model)
+                or isinstance(child_model_or_link, Link))
+        child_model_or_link.build()
+        joint_type_characteristics = self._joint_type_characteristics_param.build(
+        )
+
+        self.joint_model = JointModel(
+          self._name_param,
+          self._pose_param,
+          self.get_node_link(self.parent_node).link_model,
+          self.get_node_link(self.child_node).link_model,
+          joint_type_characteristics,
+        )
+        return self.joint_model
 
 
 # endregion
 
 
-class Model(IModel):
-    def __init__(
-        self,
-        name: str,
-        links: List[ILink] = [],
-        joints: List[IJoint] = [],
-        nestedModels: List[IModel] = [],
-        pose=Pose(),
-    ):
-        self._name = name
-        self._links = links
-        self._joints = joints
-        self._nestedModels = nestedModels
+class Model:
+    def __init__(self,
+                 name: str,
+                 root_link: Link,
+                 linksInterface: List[Link] = [],
+                 pose=Pose()):
+
+        self.name = name
+        self.root_link = root_link
+        self.links_interface = linksInterface
         self.pose = pose
-        self.URDF2type = MetamodelComponent(IModel)
+        self.model = None
 
-    @property
-    def name(self) -> str:
-        return self._name
+    def get_link(self, interface_nb: int):
+        return self.links_interface[interface_nb]
 
-    @property
-    def links(self) -> List[ILink]:
-        return self._links
+    def set_parent(self, parent):
+        self._parent_node = parent
 
-    @property
-    def joints(self) -> List[IJoint]:
-        return self._joints
+    def build(self) -> ModelModel:
+        self.root_link.build()
 
-    @property
-    def nestedModels(self) -> List[IModel]:
-        return self._nestedModels
+        links: List[LinkModel] = []
+        joints: List[JointModel] = []
+        nested_models: List[ModelModel] = []
 
-    def __str__(self) -> str:
-        strRepr = self._name + "(\n"
-        for link in self._links:
-            strRepr += " " * 4 + link.__str__() + "\n"
-        strRepr += ")"
-        return strRepr
+        def next_model(model: Model):
+            assert (model.model is not None)
+            nested_models.append(model.model)
+
+        def next_joint(joint: Joint):
+            joints.append(cast(JointModel, joint.joint_model))
+            switch_case(joint.child_node, {
+              Model: next_model, Link: next_link, None: lambda x: x
+            })
+
+        def next_link(link: Link):
+            links.append(link.link_model)
+            for joint in link.joints:
+                next_joint(joint)
+
+        next_link(self.root_link)
+
+        self.model = ModelModel(self.name, links, joints, nested_models)
+        return self.model
+
+
+class Node(ABC):
+    @abstractmethod
+    def next(self):
+        pass
 
 
 class World:

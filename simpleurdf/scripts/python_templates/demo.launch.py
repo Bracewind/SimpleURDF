@@ -8,37 +8,35 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
 
-    use_sim_time = LaunchConfiguration("use_sim_time", default="false")
+  use_sim_time = LaunchConfiguration("use_sim_time", default="false")
 
-    urdf_file_name = "assembly.urdf"
-    urdf = os.path.join(
-        get_package_share_directory("farmbot_description"), urdf_file_name
-    )
-    with open(urdf, "r") as infp:
-        robot_desc = infp.read()
+  urdf_file_name = "<model_name>"
+  urdf = os.path.join(get_package_share_directory("<package_name>"),
+                      urdf_file_name)
+  with open(urdf, "r") as infp:
+    robot_desc = infp.read()
 
-    return LaunchDescription(
-        [
-            DeclareLaunchArgument(
-                "use_sim_time",
-                default_value="false",
-                description="Use simulation (Gazebo) clock if true",
-            ),
-            Node(
-                package="robot_state_publisher",
-                executable="robot_state_publisher",
-                name="robot_state_publisher",
-                output="screen",
-                parameters=[
-                    {"use_sim_time": use_sim_time, "robot_description": robot_desc}
-                ],
-                arguments=[urdf],
-            ),
-            Node(
-                package="farmbot_description",
-                executable="state_publisher",
-                name="state_publisher",
-                output="screen",
-            ),
-        ]
-    )
+  return LaunchDescription([
+      DeclareLaunchArgument(
+          "use_sim_time",
+          default_value="false",
+          description="Use simulation (Gazebo) clock if true",
+      ),
+      Node(
+          package="robot_state_publisher",
+          executable="robot_state_publisher",
+          name="robot_state_publisher",
+          output="screen",
+          parameters=[{
+              "use_sim_time": use_sim_time,
+              "robot_description": robot_desc
+          }],
+          arguments=[urdf],
+      ),
+      Node(
+          package="<package_name>",
+          executable="state_publisher",
+          name="state_publisher",
+          output="screen",
+      ),
+  ])

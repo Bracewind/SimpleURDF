@@ -1,218 +1,217 @@
-from simpleurdf.urdf2model import metamodel
-from simpleurdf.urdf2model.basemodel import IInertial, Inertial
-from simpleurdf.urdf2model.metamodel import (
-    ICollision,
-    IContinuousJointType,
-    IGeometryBox,
-    IPrismaticJointType,
-)
+from typing import Callable, Dict, Optional, Type, cast, List
+import functools
+
 from lxml.builder import ElementMaker
 from lxml.etree import ElementTree
 
-import functools
+from simpleurdf.utils.python_extension import switch_case
 
-from typing import List, Optional
-
-from simpleurdf.urdf2model import (
-    Pose,
-    IModel,
-    ILink,
-    IVisual,
-    IMesh,
-    IGeometryCylinder,
-    IMaterial,
-    IJoint,
-    IFixedJointType,
-    ILimit,
-    IRevoluteJointType,
+from simpleurdf.urdf2model.metamodel import (
+  CollisionModel,
+  ContinuousJointTypeModel,
+  FixedJointTypeModel,
+  GeometryBoxModel,
+  GeometryCylinderModel,
+  InertialModel,
+  JointModel,
+  LimitModel,
+  LinkModel,
+  MaterialModel,
+  MeshModel,
+  ModelModel,
+  Pose,
+  PrismaticJointTypeModel,
+  RevoluteJointTypeModel,
+  VisualModel,
 )
 
 
-def _createNothingIfNullDecorator(method):
+def _create_nothing_if_null_decorator(method):
     @functools.wraps(method)
-    def createNothingIfNull(self, fstArg):
-        if fstArg is None:
+    def create_nothing_if_null(self, fst_arg):
+        if fst_arg is None:
             return None
         else:
-            return method(self, fstArg)
+            return method(self, fst_arg)
 
-    return createNothingIfNull
+    return create_nothing_if_null
+
+
+def _create_message_function(message: str):
+    def raise_exception(obj):
+        raise Exception(message)
+
+    return raise_exception
 
 
 class Urdf2ToUrdf:
-    URDF_JOINT_MAPPING = {
-        IFixedJointType.__name__: "fixed",
-        IContinuousJointType.__name__: "continuous",
-        IPrismaticJointType.__name__: "prismatic",
-        IRevoluteJointType.__name__: "revolute",
-    }
+    URDF_TYPE_JOINT_MAPPING = cast(
+      Dict[Optional[Type], Callable[[JointModel], str]],
+      {
+        FixedJointTypeModel: lambda joint: "fixed",
+        ContinuousJointTypeModel: lambda joint: "continuous",
+        PrismaticJointTypeModel: lambda joint: "prismatic",
+        RevoluteJointTypeModel: lambda joint: "revolute",
+        None: _create_message_function("type was not found")
+      })
 
     def __init__(self):
-        self.E = ElementMaker()
-        self.ROBOT = self.E.robot
-        self.LINK = self.E.link
-        self.VISUAL = self.E.visual
-        self.COLLISION = self.E.collision
-        self.INERTIAL = self.E.inertial
-        self.INERTIA = self.E.inertia
-        self.MASS = self.E.mass
-        self.GEOMETRY = self.E.geometry
-        self.MESH = self.E.mesh
-        self.BOX = self.E.box
-        self.CYLINDER = self.E.cylinder
-        self.POSE = self.E.origin
-        self.AXIS = self.E.axis
-        self.LIMIT = self.E.limit
-        self.MATERIAL = self.E.material
-        self.JOINT = self.E.joint
-        self.JOINT_PARENT = self.E.parent
-        self.JOINT_CHILD = self.E.child
+        self.em = ElementMaker()
 
-    def _removeNoneValue(self, l):
+    def _remove_none_value(self, l):
         return [elem for elem in l if elem is not None]
 
-    def createPose(self, pose: Pose):
+    def create_pose(self, pose: Pose):
         x_position, y_position, z_position = pose.xyz
         r, p, y = pose.rpy
-        return self.POSE(
-            {"rpy": f"{r} {p} {y}", "xyz": f"{x_position} {y_position} {z_position}"}
+        return self.em.origin({
+          "rpy": f"{r} {p} {y}",
+          "xyz": f"{x_position} {y_position} {z_position}"
+        })
+
+    def create_robot(self, robot: ModelModel) -> ElementTree:
+        all_links = []
+        all_joints = []
+        for model in robot.nested_models:
+            all_links += model.links
+            all_joints += model.joints
+        all_links += robot.links
+        all_joints += robot.joints
+
+        links_urdf = []
+        for link in all_links:
+            links_urdf.append(self.create_link(link))
+        joints_urdf = []
+        for joint in all_joints:
+            joints_urdf.append(self.create_joint(joint))
+        final_urdf = self._remove_none_value([{
+          "name": robot.name
+        }] + links_urdf + joints_urdf)
+        return self.em.robot(*final_urdf)
+
+    def create_link(self, link: LinkModel) -> ElementTree:
+        return self.em.link(*self._remove_none_value([
+          {
+            "name": link.name
+          },
+          self.create_collision(link.collision),
+          *self.create_visual(link.visuals),
+          self.create_inertial(link.inertial),
+        ]))
+
+    @_create_nothing_if_null_decorator
+    def create_collision(self, collision: Optional[CollisionModel]):
+        return self.em.collision(
+          self.create_pose(collision.pose),
+          self.create_geometry(collision.geometry),
         )
 
-    def createRobot(self, robot: IModel) -> ElementTree:
-        allLinks = []
-        allJoints = []
-        for model in robot.nestedModels:
-            allLinks += model.links
-            allJoints += model.joints
-        allLinks += robot.links
-        allJoints += robot.joints
-
-        linksUrdf = []
-        for link in allLinks:
-            linksUrdf.append(self.createLink(link))
-        jointsUrdf = []
-        for joint in allJoints:
-            jointsUrdf.append(self.createJoint(joint))
-        finalURDF = self._removeNoneValue(
-            [{"name": robot.name}] + linksUrdf + jointsUrdf
-        )
-        return self.ROBOT(*finalURDF)
-
-    def createLink(self, link: ILink) -> ElementTree:
-        val = self.createCollision(link.collision)
-        return self.LINK(
-            *self._removeNoneValue(
-                [
-                    {"name": link.name},
-                    self.createCollision(link.collision),
-                    *self.createVisual(link.visuals),
-                    self.createInertial(link.inertial),
-                ]
-            )
-        )
-
-    @_createNothingIfNullDecorator
-    def createCollision(self, collision: Optional[ICollision]):
-        return self.COLLISION(
-            self.createPose(collision.pose),
-            self.createGeometry(collision.geometry),
-        )
-
-    def createVisual(self, visuals: List[IVisual]):
-        urdfVisuals = []
+    def create_visual(self, visuals: List[VisualModel]):
+        urdf_visuals = []
         for visual in visuals:
-            urdfVisuals.append(
-                self.VISUAL(
-                    self.createPose(visual.pose),
-                    self.createGeometry(visual.geometry),
-                    self.createMaterial(visual.material),
-                )
-            )
-        return urdfVisuals
+            urdf_visuals.append(
+              self.em.visual(
+                self.create_pose(visual.pose),
+                self.create_geometry(visual.geometry),
+                self.create_material(visual.material),
+              ))
+        return urdf_visuals
 
-    def createGeometry(self, shape):
-        possibleGeometries = {
-            IMesh.__name__: self.createMesh,
-            IGeometryBox.__name__: self.createBox,
-            IGeometryCylinder.__name__: self.createCylinder,
-        }
-        return self.GEOMETRY(possibleGeometries[shape.URDF2type.urdf2Type](shape))
+    def create_geometry(self, shape):
+        geometry = switch_case(
+          shape,
+          {
+            MeshModel: self.create_mesh,
+            GeometryBoxModel: self.create_box,
+            GeometryCylinderModel: self.create_cylinder,
+          })
+        return self.em.geometry(geometry)
 
-    def createMesh(self, shape: IMesh):
+    def create_mesh(self, shape: MeshModel):
         x_scale, y_scale, z_scale = shape.scale
-        return self.MESH(
-            {"filename": shape.uri, "scale": f"{x_scale:g} {y_scale:g} {z_scale:g}"}
-        )
+        return self.em.mesh({
+          "filename": shape.uri,
+          "scale": f"{x_scale:g} {y_scale:g} {z_scale:g}"
+        })
 
-    def createBox(self, shape: IGeometryBox):
+    def create_box(self, shape: GeometryBoxModel):
         width, depth, length = shape.size
-        return self.BOX({"size": f"{width:g} {depth:g} {length:g}"})
+        return self.em.box({"size": f"{width:g} {depth:g} {length:g}"})
 
-    def createCylinder(self, shape: IGeometryCylinder):
-        return self.CYLINDER({"radius": str(shape.radius), "length": str(shape.length)})
+    def create_cylinder(self, shape: GeometryCylinderModel):
+        return self.em.cylinder({
+          "radius": str(shape.radius), "length": str(shape.length)
+        })
 
-    def createMaterial(self, material: IMaterial):
-        return self.MATERIAL({"name": material.name})
+    def create_material(self, material: MaterialModel):
+        return self.em.material({"name": material.name})
 
-    @_createNothingIfNullDecorator
-    def createInertial(self, inertial: IInertial):
+    @_create_nothing_if_null_decorator
+    def create_inertial(self, inertial: InertialModel):
         ixx, ixy, ixz, iyy, iyz, izz = inertial.inertia
-        return self.INERTIAL(
-            self.createPose(inertial.pose),
-            self.MASS({"value": f"{inertial.mass:g}"}),
-            self.INERTIA(
-                {
-                    "ixx": f"{ixx:g}",
-                    "ixy": f"{ixy:g}",
-                    "ixz": f"{ixz:g}",
-                    "iyy": f"{iyy:g}",
-                    "iyz": f"{iyz:g}",
-                    "izz": f"{izz:g}",
-                }
-            ),
+        return self.em.inertial(
+          self.create_pose(inertial.pose),
+          self.em.mass({"value": f"{inertial.mass:g}"}),
+          self.em.inertia({
+            "ixx": f"{ixx:g}",
+            "ixy": f"{ixy:g}",
+            "ixz": f"{ixz:g}",
+            "iyy": f"{iyy:g}",
+            "iyz": f"{iyz:g}",
+            "izz": f"{izz:g}",
+          }),
         )
 
-    def createJoint(self, joint) -> ElementTree:
+    def create_joint(self, joint) -> ElementTree:
+        def default(joint_characteristics):
+            raise Exception(
+              f"JointType not recognized, found {joint_characteristics}")
 
-        # Used to add to the xml axis and limit if it makes sense for the joint
-        switcher = {
-            IFixedJointType.__name__: lambda: [],
-            IPrismaticJointType.__name__: lambda: [
-                self.createAxis(joint.jointTypeCharacteristics.translationAxis),
-                self.createLimit(joint.jointTypeCharacteristics.limit),
+        # _used to add to the xml axis and limit if it makes sense for the joint
+        joint_type_related_attributes = switch_case(
+          joint.joint_characteristics,
+          {
+            FixedJointTypeModel:
+            lambda joint_characteristics: [],
+            PrismaticJointTypeModel:
+            lambda joint_characteristics: [
+              self.create_axis(joint_characteristics.translation_axis),
+              self.create_limit(joint_characteristics.limit),
             ],
-            IContinuousJointType.__name__: lambda: [
-                self.createAxis(joint.jointTypeCharacteristics.rotationAxis)
+            ContinuousJointTypeModel:
+            lambda joint_characteristics:
+            [self.create_axis(joint_characteristics.rotation_axis)],
+            RevoluteJointTypeModel:
+            lambda joint_characteristics: [
+              self.create_axis(joint_characteristics.rotation_axis),
+              self.create_limit(joint_characteristics.limit),
             ],
-            IRevoluteJointType.__name__: lambda: [
-                self.createAxis(joint.jointTypeCharacteristics.rotationAxis),
-                self.createLimit(joint.jointTypeCharacteristics.limit),
-            ],
-        }
+            None:
+            default
+          })
 
-        return self.JOINT(
-            {
-                "name": joint.name,
-                "type": Urdf2ToUrdf.URDF_JOINT_MAPPING[
-                    joint.jointTypeCharacteristics.URDF2type.urdf2Type
-                ],
-            },
-            *switcher[joint.jointTypeCharacteristics.URDF2type.urdf2Type](),
-            self.createPose(joint.pose),
-            self.JOINT_PARENT({"link": joint.parent.name}),
-            self.JOINT_CHILD({"link": joint.child.name}),
+        return self.em.joint(
+          {
+            "name":
+            joint.name,
+            "type":
+            switch_case(joint.joint_characteristics,
+                        Urdf2ToUrdf.URDF_TYPE_JOINT_MAPPING),
+          },
+          *joint_type_related_attributes,
+          self.create_pose(joint.pose),
+          self.em.parent({"link": joint.parent.name}),
+          self.em.child({"link": joint.child.name}),
         )
 
-    def createAxis(self, axis: List[float]):
+    def create_axis(self, axis: List[float]):
         x, y, z = axis
-        return self.AXIS({"xyz": f"{x:g} {y:g} {z:g}"})
+        return self.em.axis({"xyz": f"{x:g} {y:g} {z:g}"})
 
-    def createLimit(self, limit: ILimit):
-        return self.LIMIT(
-            {
-                "lower": f"{limit.lower:g}",
-                "upper": f"{limit.upper:g}",
-                "effort": f"{limit.effort:g}",
-                "velocity": f"{limit.velocity:g}",
-            }
-        )
+    def create_limit(self, limit: LimitModel):
+        return self.em.limit({
+          "lower": f"{limit.lower:g}",
+          "upper": f"{limit.upper:g}",
+          "effort": f"{limit.effort:g}",
+          "velocity": f"{limit.velocity:g}",
+        })

@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 
-from .metamodel import IModel
+from .basemodel import Model
 
 
 class UrdfFactory(ABC):
     @abstractmethod
-    def buildModel(self) -> IModel:
+    def build_model(self) -> Model:
         pass

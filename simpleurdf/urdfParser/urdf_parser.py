@@ -13,8 +13,7 @@ import simpleurdf.urdfParser.urdf as urdf
 
 class UrdfParser:
     """class used to load, traverse, and create URDF files"""
-
-    def loadURDFFile(self, file):
+    def loadURDFFile(self, file: str):
         """with open(sys.path[0] + "/../xsdFile/urdf_modified.xsd", "r") as f:
         schema = etree.XMLSchema(file=f)
         parser = objectify.makeparser(schema=schema)
@@ -25,14 +24,15 @@ class UrdfParser:
             urdfFile = urdf.CreateFromDocument(f.read())
             a = 4
 
-    def createURDFString(self, robot) -> str:
-        treeRobot = Urdf2ToUrdf().createRobot(robot)
+    def createURDFString(self, robot: Model) -> str:
+        model = robot.build()
+        treeRobot = Urdf2ToUrdf().create_robot(model)
         return etree.tostring(treeRobot, pretty_print=True, encoding=str)
         # world = urdfSerializer.createWorld(world)
         # etree.indent(world)
         # etree.ElementTree(world).write(open(pathToFile, "wb"))
 
-    def createURDFFile(self, robot, pathToFile):
+    def createURDFFile(self, robot: Model, pathToFile: str):
         urdfRobot = self.createURDFString(robot)
         a = type(urdfRobot)
         with open(pathToFile, "w") as file:

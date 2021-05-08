@@ -1,25 +1,25 @@
 import os
+from simpleurdf.urdf2model.metamodel import ModelModel
 from tests.reference_model.robot_with_geometry_form import RobotWithGeometryForm
 from tests.reference_model.robot_with_one_fixed_joint import RobotWithOneFixedJoint
 from tests.reference_model.robot_with_link_only import RobotWithLinkOnly
 from tests.reference_model.robot_with_one_revolute_joint import (
-    RobotWithOneRevoluteJoint,
-)
+  RobotWithOneRevoluteJoint, )
 from tests.reference_model.robot_with_geometry_form import RobotWithGeometryForm
 import pytest
 
-from simpleUrdfModelExample import RRbot
+#from simpleUrdfModelExample import RRbot
 
-from tests.model_test.robot_with_name_only import RobotWithNameOnly
-
-from simpleurdf.urdf2model import Model, Joint, Link, IModel
+from simpleurdf.urdf2model import Model, Joint, Link
 from simpleurdf import UrdfParser
+
+from simpleUrdfModelExample import RRbot
 
 from lxml import etree
 
 from simpleurdf.urdfParser import urdf
 
-from simpleUrdfModelExample.hopper.hopper import model
+#from simpleUrdfModelExample.hopper.hopper import model
 
 
 def test_ok():
@@ -28,20 +28,20 @@ def test_ok():
 
 
 @pytest.mark.parametrize(
-    "robot_in_python, filename_containing_urdf_model",
-    [
-        (RobotWithNameOnly().buildModel(), "robot_with_name_only.urdf"),
-        (RobotWithLinkOnly().buildModel(), "robot_with_link_only.urdf"),
-        (RobotWithOneFixedJoint().buildModel(), "robot_with_one_fixed_joint.urdf"),
-        (
-            RobotWithOneRevoluteJoint().buildModel(),
-            "robot_with_one_revolute_joint.urdf",
-        ),
-        (RobotWithGeometryForm().buildModel(), "robot_with_geometry_form.urdf"),
-        (RRbot(), "rrbot.urdf"),
-    ],
+  "robot_in_python, filename_containing_urdf_model",
+  [
+    (RobotWithLinkOnly().build_model(), "robot_with_link_only.urdf"),
+    (RobotWithOneFixedJoint().build_model(),
+     "robot_with_one_fixed_joint.urdf"),
+    (
+      RobotWithOneRevoluteJoint().build_model(),
+      "robot_with_one_revolute_joint.urdf",
+    ),
+    (RobotWithGeometryForm().build_model(), "robot_with_geometry_form.urdf"),
+    (RRbot(), "rrbot.urdf"),
+  ],
 )
-def test_with_ref_file(robot_in_python: IModel, filename_containing_urdf_model):
+def test_with_ref_file(robot_in_python: Model, filename_containing_urdf_model):
     """robot_in_python contains the robot representation in python,
     filename_containing_urdf_model is the file containing the representation of the robot in urdf"""
 
@@ -49,37 +49,39 @@ def test_with_ref_file(robot_in_python: IModel, filename_containing_urdf_model):
     urdfRepr = parser.createURDFString(robot_in_python)
 
     current_path = os.getcwd()
-    path_to_ref_model_from_module = os.path.join(
-        current_path, "tests", "reference_model"
-    )
+    path_to_ref_model_from_module = os.path.join(current_path,
+                                                 "tests",
+                                                 "reference_model")
 
-    complete_path = os.path.join(
-        path_to_ref_model_from_module, filename_containing_urdf_model
-    )
+    complete_path = os.path.join(path_to_ref_model_from_module,
+                                 filename_containing_urdf_model)
     with open(complete_path, "r") as f:
         urdf_robot_repr = etree.parse(f)
-        urdf_robot_linted = etree.tostring(
-            urdf_robot_repr, pretty_print=True, encoding=str
-        )
+        urdf_robot_linted = etree.tostring(urdf_robot_repr,
+                                           pretty_print=True,
+                                           encoding=str)
         assert urdf_robot_linted == urdfRepr
 
 
 @pytest.mark.parametrize(
-    "model, filename_for_model",
-    [
-        (RobotWithNameOnly().buildModel(), "robot_with_name_only.urdf"),
-        (RobotWithLinkOnly().buildModel(), "robot_with_link_only.urdf"),
-        (RobotWithOneFixedJoint().buildModel(), "robot_with_one_fixed_joint.urdf"),
-        (
-            RobotWithOneRevoluteJoint().buildModel(),
-            "robot_with_one_revolute_joint.urdf",
-        ),
-        (RobotWithGeometryForm().buildModel(), "robot_with_geometry_form.urdf"),
-        (RRbot(), "rrbot.urdf"),
-    ],
+  "model, filename_for_model",
+  [
+    (RobotWithLinkOnly().build_model(), "robot_with_link_only.urdf"),
+    (RobotWithOneFixedJoint().build_model(),
+     "robot_with_one_fixed_joint.urdf"),
+    (
+      RobotWithOneRevoluteJoint().build_model(),
+      "robot_with_one_revolute_joint.urdf",
+    ),
+    (RobotWithGeometryForm().build_model(), "robot_with_geometry_form.urdf"),
+    (RRbot(), "rrbot.urdf"),
+  ],
 )
 def test_create_file(model, filename_for_model):
     broker = UrdfParser()
     path = os.getcwd()
-    pathToFile = os.path.join(path, "tests", "model_generated", filename_for_model)
+    pathToFile = os.path.join(path,
+                              "tests",
+                              "model_generated",
+                              filename_for_model)
     broker.createURDFFile(model, pathToFile)

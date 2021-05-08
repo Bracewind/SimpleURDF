@@ -2,8 +2,6 @@
 <robot name="test_robot">
   <link name="link1"/>
   <link name="link2"/>
-  <link name="link3"/>
-  <link name="link4"/>
   <joint name="fixed_joint" type="revolute">
     <axis xyz="0 1 0"/>
     <limit lower="-3.14159" upper="3.14159" effort="1000" velocity="1"/>

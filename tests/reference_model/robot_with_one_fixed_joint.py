@@ -1,26 +1,21 @@
+from simpleurdf.urdf2model.metamodel import DynamicsModel
 from simpleurdf.urdf2model.basemodel import FixedJointType, Joint
 from simpleurdf.urdf2model import UrdfFactory
-from simpleurdf.urdf2model import Model, Link
+from simpleurdf.urdf2model import ModelModel, Model, Link
 
 
 class RobotWithOneFixedJoint(UrdfFactory):
-    def buildModel(self):
-        link1 = Link(name="link1")
-        link2 = Link(name="link2")
+    def build_model(self) -> Model:
         return Model(
-            name="test_robot",
-            links=[
-                link1,
-                Link(name="link2"),
-                Link(name="link3"),
-                Link(name="link4"),
-            ],
+          name="test_robot",
+          root_link=Link(
+            name="link1",
             joints=[
-                Joint(
-                    name="fixed_joint",
-                    parent=link1,
-                    child=link2,
-                    jointTypeCharacteristics=FixedJointType(),
-                )
+              Joint(
+                name="fixed_joint",
+                joint_type_characteristics=FixedJointType(DynamicsModel(1)),
+                child=Link(name="link2"),
+              )
             ],
+          ),
         )

@@ -4,7 +4,11 @@
     "python.testing.pytestArgs": [
         "tests"
     ],
-    "python.formatting.provider": "black",
+    "python.linting.enabled": true,
+    "python.linting.pylintPath": "venv/simpleurdf-N0_-Sw1X-py3.8/bin/pylint",
+    "editor.formatOnSave": true,
+    "python.formatting.yapfArgs": ["--style", "${workspaceRoot}/.style.yapf"],
+    "python.formatting.provider": "yapf",
     "python.testing.unittestEnabled": false,
     "python.testing.nosetestsEnabled": false,
     "python.testing.pytestEnabled": true,

@@ -1,7 +1,7 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from enum import Enum
-from typing import List
-import math
+from typing import List, NamedTuple
+from dataclasses import dataclass
 
 MODEL = "model"
 LINK = "link"
@@ -9,12 +9,12 @@ JOINT = "joint"
 
 
 class MetamodelComponent:
-    def __init__(self, URDF2Type):
-        self.URDF2type = URDF2Type
+    def __init__(self, urdf2_type):
+        self.urdf2type = urdf2_type
 
     @property
-    def urdf2Type(self):
-        return self.URDF2type.__name__
+    def urdf2_type(self):
+        return self.urdf2type.__name__
 
 
 class Pose:
@@ -31,316 +31,170 @@ class GeometryType(Enum):
     CYLINDER = "cylinder"
 
 
-class IMesh(ABC):
-    def __init__(self):
-        self.URDF2type = MetamodelComponent(IMesh)
-
-    @property
-    @abstractmethod
-    def uri(self):
-        pass
-
-    @property
-    @abstractmethod
-    def scale(self) -> List[float]:
-        pass
+class XYZ(NamedTuple):
+    x: float
+    y: float
+    z: float
 
 
-class IGeometryBox(ABC):
-    def __init__(self) -> None:
-        super().__init__()
-        self.URDF2type = MetamodelComponent(IGeometryBox)
-
-    @property
-    @abstractmethod
-    def size(self) -> List[float]:
-        pass
+class Inertia(NamedTuple):
+    ixx: float
+    ixy: float
+    ixz: float
+    iyy: float
+    iyz: float
+    izz: float
 
 
-class IGeometryCylinder(ABC):
-    def __init__(self):
-        self.URDF2type = MetamodelComponent(IGeometryCylinder)
-
-    @property
-    @abstractmethod
-    def radius(self) -> float:
-        pass
-
-    @property
-    @abstractmethod
-    def length(self) -> float:
-        pass
+class Color(NamedTuple):
+    red: float
+    green: float
+    blue: float
+    alpha: float
 
 
-class IInertial(ABC):
-    def __init__(self) -> None:
-        pass
+@dataclass
+class Uri:
+    path: str
 
-    @property
-    @abstractmethod
-    def pose(self) -> Pose:
-        pass
 
-    @property
-    @abstractmethod
-    def mass(self) -> float:
-        pass
+@dataclass
+class PackageUri(Uri):
+    package: str
 
-    @property
-    @abstractmethod
-    def inertia(self) -> List[float]:
-        pass
+
+class Geometry:
+    pass
+
+
+@dataclass
+class MeshModel(Geometry):
+    uri: Uri
+    scale: XYZ
+
+
+@dataclass
+class GeometryBoxModel(Geometry):
+    size: XYZ
+
+
+@dataclass
+class GeometryCylinderModel(Geometry):
+    radius: float
+    length: float
+
+
+@dataclass
+class InertialModel:
+    pose: Pose
+    mass: float
+    inertia: Inertia
 
 
 # endregion
-
 
 # region Visual class
 
 
-class IMaterial(ABC):
-    @property
-    @abstractmethod
-    def name(self):
-        pass
-
-    @property
-    @abstractmethod
-    def ambient(self):
-        pass
-
-    @property
-    @abstractmethod
-    def diffuse(self):
-        pass
-
-    @property
-    @abstractmethod
-    def specular(self):
-        pass
-
-    @property
-    @abstractmethod
-    def emissive(self):
-        pass
+@dataclass
+class MaterialModel:
+    name: str
 
 
-class IVisual(ABC):
-    @property
-    @abstractmethod
-    def geometry(self):
-        pass
+@dataclass
+class ClassicalMaterialModel(MaterialModel):
+    ambient: Color
+    diffuse: Color
+    specular: Color
+    emissive: Color
 
-    @property
-    @abstractmethod
-    def material(self) -> IMaterial:
-        pass
 
-    @property
-    @abstractmethod
-    def pose(self) -> Pose:
-        pass
-
-    @property
-    @abstractmethod
-    def parent_frame(self):
-        pass
+@dataclass
+class VisualModel:
+    geometry: Geometry
+    material: MaterialModel
+    pose: Pose
 
 
 # endregion
 
 
-class IDynamics(ABC):
-    def __init__(self) -> None:
-        super().__init__()
-
-    @property
-    @abstractmethod
-    def damping(self):
-        pass
+@dataclass
+class DynamicsModel:
+    damping: float
 
 
-class ICollision(ABC):
-    def __init__(self) -> None:
-        super().__init__()
-
-    @property
-    @abstractmethod
-    def geometry(self):
-        pass
-
-    @property
-    @abstractmethod
-    def pose(self) -> Pose:
-        pass
+@dataclass
+class CollisionModel:
+    geometry: Geometry
+    pose: Pose
 
 
-class ILimit(ABC):
-    @property
-    @abstractmethod
-    def lower(self):
-        pass
-
-    @property
-    @abstractmethod
-    def upper(self):
-        pass
-
-    @property
-    @abstractmethod
-    def effort(self):
-        pass
-
-    @property
-    @abstractmethod
-    def velocity(self):
-        pass
+@dataclass
+class LimitModel:
+    lower: float
+    upper: float
+    effort: float
+    velocity: float
 
 
-class ILink(ABC):
-    def __init__(self):
-        self.URDF2type = MetamodelComponent(ILink)
+@dataclass
+class LinkModel:
+    name: str
+    collision: CollisionModel
+    visuals: List[VisualModel]
+    inertial: InertialModel
+    pose: Pose
 
-    @property
-    @abstractmethod
-    def name(self) -> str:
-        pass
-
-    @property
-    @abstractmethod
-    def collision(self) -> ICollision:
-        pass
-
-    @property
-    @abstractmethod
-    def visuals(self) -> List[IVisual]:
-        pass
-
-    @property
-    @abstractmethod
-    def inertial(self) -> IInertial:
-        pass
-
-
-class JointType(Enum):
-    CONTINUOUS = 0
-    FIXED = 1
-    REVOLUTE = 2
+    def get_name(self):
+        return self.name
 
 
 # region Joints
 
 
-class IJointType(ABC):
-    def __init__(self) -> None:
-        super().__init__()
-
-    @property
-    @abstractmethod
-    def dynamics(self) -> IDynamics:
-        pass
+@dataclass
+class JointTypeModel(ABC):
+    dynamics: DynamicsModel
 
 
-class IJoint(ABC):
-    def __init__(self) -> None:
-        super().__init__()
-        self.URDF2type = MetamodelComponent(IJoint)
-
-    @property
-    @abstractmethod
-    def name(self) -> str:
-        pass
-
-    @property
-    @abstractmethod
-    def pose(self) -> Pose:
-        pass
-
-    @property
-    @abstractmethod
-    def parent(self) -> ILink:
-        pass
-
-    @property
-    @abstractmethod
-    def child(self) -> ILink:
-        pass
-
-    @property
-    @abstractmethod
-    def jointTypeCharacteristics(self) -> IJointType:
-        pass
+@dataclass
+class JointModel:
+    name: str
+    pose: Pose
+    parent: LinkModel
+    child: LinkModel
+    joint_characteristics: JointTypeModel
 
 
-class IFixedJointType(IJointType):
-    def __init__(self) -> None:
-        super().__init__()
-        self.URDF2type = MetamodelComponent(IFixedJointType)
+@dataclass
+class FixedJointTypeModel(JointTypeModel):
+    pass
 
 
-class IPrismaticJointType(IJointType):
-    def __init__(self) -> None:
-        super().__init__()
-        self.URDF2type = MetamodelComponent(IPrismaticJointType)
-
-    @property
-    @abstractmethod
-    def translationAxis(self) -> List[float]:
-        pass
-
-    @property
-    @abstractmethod
-    def limit(self) -> ILimit:
-        pass
+@dataclass
+class PrismaticJointTypeModel(JointTypeModel):
+    translation_axis: XYZ
+    limit: LimitModel
 
 
-class IContinuousJointType(IJointType):
-    def __init__(self) -> None:
-        super().__init__()
-        self.URDF2type = MetamodelComponent(IContinuousJointType)
-
-    @property
-    @abstractmethod
-    def rotationAxis(self) -> List[float]:
-        pass
+@dataclass
+class ContinuousJointTypeModel(JointTypeModel):
+    rotation_axis: XYZ
 
 
-class IRevoluteJointType(IJointType):
-    def __init__(self) -> None:
-        super().__init__()
-        self.URDF2type = MetamodelComponent(IRevoluteJointType)
-
-    @property
-    @abstractmethod
-    def rotationAxis(self):
-        pass
-
-    @property
-    @abstractmethod
-    def limit(self) -> ILimit:
-        pass
+@dataclass
+class RevoluteJointTypeModel(JointTypeModel):
+    rotation_axis: XYZ
+    limit: LimitModel
 
 
 # endregion
 
 
-class IModel(ABC):
-    @property
-    @abstractmethod
-    def name(self) -> str:
-        pass
-
-    @property
-    @abstractmethod
-    def links(self) -> List[ILink]:
-        pass
-
-    @property
-    @abstractmethod
-    def joints(self) -> List[IJoint]:
-        pass
-
-    @property
-    @abstractmethod
-    def nestedModels(self) -> List:
-        pass
+@dataclass
+class ModelModel:
+    name: str
+    links: List[LinkModel]
+    joints: List[JointModel]
+    nested_models: List

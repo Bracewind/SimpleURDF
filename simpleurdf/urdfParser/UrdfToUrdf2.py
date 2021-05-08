@@ -49,10 +49,10 @@ class UrdfToUrdf2:
     def createJoint(self, context, urdfJoint):
         jointType = JOINT_TYPE_MAPPING[urdfJoint.get("type")]
         joint = Joint(
-            urdfJoint.get("name"),
-            jointType,
-            context[urdfJoint.get("parent")],
-            context[urdfJoint.get("child")],
+          urdfJoint.get("name"),
+          jointType,
+          context[urdfJoint.get("parent")],
+          context[urdfJoint.get("child")],
         )
         return joint
 

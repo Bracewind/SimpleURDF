@@ -11,7 +11,7 @@ Brot and Games CLI
 Version: $(cat $BAGCLI_WORKDIR/VERSION)
 Usage: $cli_name [command]
 Commands:
-  deploy    Deploy
+  create_pkg    create a description package ready to use
   *         Help
 "
   exit 1
