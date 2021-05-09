@@ -114,11 +114,7 @@ white = MaterialColor(name="white", ambient=[0, 0, 0, 1])
 
 
 class Visual(VisualModel):
-    def __init__(self,
-                 geometry: Geometry,
-                 pose=Pose(),
-                 material=white,
-                 parent_frame=PARENT):
+    def __init__(self, geometry: Geometry, pose=Pose(), material=white, parent_frame=PARENT):
         super().__init__(geometry, material, pose)
 
 
@@ -203,10 +199,7 @@ class Cylinder(Link):
 
         visuals: List[VisualModel] = [Visual(geometry_cylinder, self._pose)]
 
-        inertial = InertialCylinder(self._radius,
-                                    self._length,
-                                    self._pose,
-                                    self._mass)
+        inertial = InertialCylinder(self._radius, self._length, self._pose, self._mass)
 
         super().__init__(name, collision, visuals, inertial, joints, pose)
 
@@ -238,9 +231,7 @@ class Box(Link):
             collision = Collision(GeometryBox(self._size), pose)
 
         # create visuals
-        visuals: List[VisualModel] = [
-          Visual(GeometryBox(self._size), self._pose)
-        ]
+        visuals: List[VisualModel] = [Visual(GeometryBox(self._size), self._pose)]
 
         # create inertials
         inertial = InertialBox(self._size, self._pose, self._mass)
@@ -276,10 +267,7 @@ class ContinuousJointType(JointType):
 
 
 class RevoluteJointType(JointType):
-    def __init__(self,
-                 rotation_axis: XYZ,
-                 limit: LimitModel,
-                 joint_physic=Dynamics()):
+    def __init__(self, rotation_axis: XYZ, limit: LimitModel, joint_physic=Dynamics()):
         self.joint_type = RevoluteJointTypeModel(
           joint_physic,
           rotation_axis,
@@ -317,12 +305,9 @@ class Joint:
             return model[0].get_link(model[1])
 
         def default(value_seen) -> Link:
-            raise Exception(
-              f"the node has an invalid type {value_seen.__class__}")
+            raise Exception(f"the node has an invalid type {value_seen.__class__}")
 
-        return switch_case(node, {
-          tuple: case_model, Link: case_link, None: default
-        })
+        return switch_case(node, {tuple: case_model, Link: case_link, None: default})
 
     def next(self):
         return self.child_node
@@ -334,11 +319,9 @@ class Joint:
         child_model_or_link = self.child_node
         if isinstance(self.child_node, tuple):
             child_model_or_link = self.child_node[0]
-        assert (isinstance(child_model_or_link, Model)
-                or isinstance(child_model_or_link, Link))
+        assert (isinstance(child_model_or_link, Model) or isinstance(child_model_or_link, Link))
         child_model_or_link.build()
-        joint_type_characteristics = self._joint_type_characteristics_param.build(
-        )
+        joint_type_characteristics = self._joint_type_characteristics_param.build()
 
         self.joint_model = JointModel(
           self._name_param,
@@ -354,11 +337,7 @@ class Joint:
 
 
 class Model:
-    def __init__(self,
-                 name: str,
-                 root_link: Link,
-                 linksInterface: List[Link] = [],
-                 pose=Pose()):
+    def __init__(self, name: str, root_link: Link, linksInterface: List[Link] = [], pose=Pose()):
 
         self.name = name
         self.root_link = root_link
@@ -379,22 +358,26 @@ class Model:
         joints: List[JointModel] = []
         nested_models: List[ModelModel] = []
 
-        def next_model(model: Model):
-            assert (model.model is not None)
-            nested_models.append(model.model)
+        def next_model(model: Tuple[Model, int]) -> None:
+            assert (model[0].model is not None)
+            nested_models.append(model[0].model)
 
-        def next_joint(joint: Joint):
+        def next_joint(joint: Joint) -> None:
             joints.append(cast(JointModel, joint.joint_model))
             switch_case(joint.child_node, {
-              Model: next_model, Link: next_link, None: lambda x: x
+              tuple: next_model, Link: next_link, None: lambda x: None
             })
 
-        def next_link(link: Link):
+        def next_link(link: Link) -> None:
             links.append(link.link_model)
             for joint in link.joints:
                 next_joint(joint)
 
         next_link(self.root_link)
+
+        # if no links were given, we supposed that the model is a tree and that the root_link is an interface
+        if self.links_interface == []:
+            self.links_interface = [self.root_link]
 
         self.model = ModelModel(self.name, links, joints, nested_models)
         return self.model

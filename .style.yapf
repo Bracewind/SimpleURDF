@@ -4,3 +4,4 @@ based_on_style=pep8
 indent_width=4
 continuation_indent_width=2
 SPLIT_BEFORE_NAMED_ASSIGNS=True
+column_limit = 100

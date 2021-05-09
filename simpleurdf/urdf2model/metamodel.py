@@ -1,6 +1,6 @@
 from abc import ABC
 from enum import Enum
-from typing import List, NamedTuple
+from typing import List, NamedTuple, Union
 from dataclasses import dataclass
 
 MODEL = "model"
@@ -54,13 +54,14 @@ class Color(NamedTuple):
 
 
 @dataclass
-class Uri:
+class FullPathUri:
     path: str
 
 
 @dataclass
-class PackageUri(Uri):
+class PackageUri:
     package: str
+    path: str
 
 
 class Geometry:
@@ -69,7 +70,7 @@ class Geometry:
 
 @dataclass
 class MeshModel(Geometry):
-    uri: Uri
+    uri: Union[FullPathUri, PackageUri]
     scale: XYZ
 
 

@@ -48,13 +48,19 @@ class RRbot(Model):
                   depth=width,
                   height=height1,
                   mass=mass,
-                  pose=Pose(xyz=[0, 0, height1 / 2]),
+                  pose=Pose(xyz=[
+                    0,
+                    0,
+                    height1 / 2,
+                  ], ),
                   joints=[
                     Joint(
                       name="joint1",
                       pose=Pose(xyz=[0, width, height1 - axel_offset]),
                       joint_type_characteristics=ContinuousJointType(
-                        XYZ(0, 1, 0), joint_physic=Dynamics(0.7)),
+                        XYZ(0, 1, 0),
+                        joint_physic=Dynamics(0.7),
+                      ),
                       child=Box(
                         name="link2",
                         material=black,
@@ -66,10 +72,11 @@ class RRbot(Model):
                         joints=[
                           Joint(
                             name="joint2",
-                            pose=Pose(
-                              xyz=[0, width, height2 - 2 * axel_offset]),
+                            pose=Pose(xyz=[0, width, height2 - 2 * axel_offset]),
                             joint_type_characteristics=ContinuousJointType(
-                              XYZ(0.0, 1.0, 0.0), joint_physic=Dynamics(0.7)),
+                              XYZ(0.0, 1.0, 0.0),
+                              joint_physic=Dynamics(0.7),
+                            ),
                             child=Box(
                               name="link3",
                               material=orange,
@@ -77,37 +84,40 @@ class RRbot(Model):
                               depth=width,
                               height=height3,
                               mass=mass,
-                              pose=Pose(xyz=[0, 0, height3 / 2 - axel_offset]),
+                              pose=Pose(xyz=[
+                                0,
+                                0,
+                                height3 / 2 - axel_offset,
+                              ], ),
                               joints=[
                                 Joint(
                                   name="hokuyo_joint",
-                                  joint_type_characteristics=FixedJointType(
-                                    DynamicsModel(1)),
+                                  joint_type_characteristics=FixedJointType(DynamicsModel(1)),
                                   pose=Pose(xyz=[
-                                    0.0, 0.0, height3 - axel_offset / 2.0
-                                  ]),
+                                    0.0,
+                                    0.0,
+                                    height3 - axel_offset / 2.0,
+                                  ], ),
                                   child=Link(
                                     name="hokuyo_link",
-                                    collision=Collision(
-                                      GeometryBox(XYZ(0.1, 0.1, 0.1))),
+                                    collision=Collision(GeometryBox(XYZ(
+                                      0.1,
+                                      0.1,
+                                      0.1,
+                                    ), ), ),
                                     visuals=[
-                                      Visual(geometry=Mesh(
-                                        uri=PackageUri("meshes/hokuyo.dae",
-                                                       "rrbot_description")))
+                                      Visual(geometry=Mesh(uri=PackageUri(
+                                        "rrbot_description",
+                                        "meshes/hokuyo.dae",
+                                      ), ), ),
                                     ],
-                                    inertial=InertialBox(XYZ(0.1, 0.1, 0.1),
-                                                         mass=1e-5),
+                                    inertial=InertialBox(XYZ(0.1, 0.1, 0.1), mass=1e-5),
                                   ),
                                 ),
                                 Joint(
                                   name="camera_joint",
-                                  joint_type_characteristics=FixedJointType(
-                                    DynamicsModel(1)),
-                                  pose=Pose(xyz=[
-                                    camera_link,
-                                    0.0,
-                                    height3 - 2 * axel_offset
-                                  ]),
+                                  joint_type_characteristics=FixedJointType(DynamicsModel(1)),
+                                  pose=Pose(xyz=[camera_link, 0, height3 - 2 * axel_offset]),
                                   child=Box(
                                     name="camera_link",
                                     material=red,
@@ -119,18 +129,21 @@ class RRbot(Model):
                                       Joint(
                                         name="camera_optical_joint",
                                         pose=Pose(rpy=[-pi / 2, 0, -pi / 2]),
-                                        joint_type_characteristics=
-                                        FixedJointType(DynamicsModel(1)),
+                                        joint_type_characteristics=FixedJointType(DynamicsModel(1)),
                                         child=Link("camera_link_optical"),
                                       ),
-                                    ]),
+                                    ],
+                                  ),
                                 ),
-                              ]),
+                              ],
+                            ),
                           ),
-                        ]),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
             ],
-          ))
+          ),
+        )

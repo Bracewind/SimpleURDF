@@ -15,6 +15,7 @@
     "cSpell.words": [
         "URDF",
         "lxml",
+        "pytest",
         "simpleurdf"
     ],
     "terminal.integrated.env.linux": {"PYTHONPATH": "${workspaceFolder}"}

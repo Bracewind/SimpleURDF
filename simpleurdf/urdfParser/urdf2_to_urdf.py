@@ -10,6 +10,7 @@ from simpleurdf.urdf2model.metamodel import (
   CollisionModel,
   ContinuousJointTypeModel,
   FixedJointTypeModel,
+  FullPathUri,
   GeometryBoxModel,
   GeometryCylinderModel,
   InertialModel,
@@ -19,6 +20,7 @@ from simpleurdf.urdf2model.metamodel import (
   MaterialModel,
   MeshModel,
   ModelModel,
+  PackageUri,
   Pose,
   PrismaticJointTypeModel,
   RevoluteJointTypeModel,
@@ -129,9 +131,14 @@ class Urdf2ToUrdf:
 
     def create_mesh(self, shape: MeshModel):
         x_scale, y_scale, z_scale = shape.scale
+        path = switch_case(
+          shape.uri,
+          {
+            FullPathUri: lambda uri: uri.path,
+            PackageUri: lambda uri: f"package://{uri.package}/{uri.path}"
+          })
         return self.em.mesh({
-          "filename": shape.uri,
-          "scale": f"{x_scale:g} {y_scale:g} {z_scale:g}"
+          "filename": path, "scale": f"{x_scale:g} {y_scale:g} {z_scale:g}"
         })
 
     def create_box(self, shape: GeometryBoxModel):
