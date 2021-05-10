@@ -15,6 +15,7 @@
     "cSpell.words": [
         "URDF",
         "lxml",
+        "pylint",
         "pytest",
         "simpleurdf"
     ],

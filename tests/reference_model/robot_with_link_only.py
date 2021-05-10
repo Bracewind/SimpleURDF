@@ -1,4 +1,3 @@
-from simpleurdf.urdf2model.metamodel import ModelModel
 from simpleurdf.urdf2model import UrdfFactory
 from simpleurdf.urdf2model import Model, Link
 

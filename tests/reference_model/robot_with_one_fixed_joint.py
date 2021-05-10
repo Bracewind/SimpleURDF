@@ -1,7 +1,7 @@
 from simpleurdf.urdf2model.metamodel import DynamicsModel
 from simpleurdf.urdf2model.basemodel import FixedJointType, Joint
 from simpleurdf.urdf2model import UrdfFactory
-from simpleurdf.urdf2model import ModelModel, Model, Link
+from simpleurdf.urdf2model import Model, Link
 
 
 class RobotWithOneFixedJoint(UrdfFactory):

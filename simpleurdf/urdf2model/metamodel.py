@@ -1,6 +1,7 @@
+#pylint: disable=too-few-public-methods
+
 from abc import ABC
-from enum import Enum
-from typing import List, NamedTuple, Union
+from typing import List, NamedTuple, Union, Optional
 from dataclasses import dataclass
 
 MODEL = "model"
@@ -8,27 +9,12 @@ LINK = "link"
 JOINT = "joint"
 
 
-class MetamodelComponent:
-    def __init__(self, urdf2_type):
-        self.urdf2type = urdf2_type
-
-    @property
-    def urdf2_type(self):
-        return self.urdf2type.__name__
-
-
-class Pose:
-    def __init__(self, rpy=[0, 0, 0], xyz=[0, 0, 0]):
+class PoseModel:
+    def __init__(self, rpy, xyz):
         if len(rpy) != 3 or len(xyz) != 3:
             raise Exception(f"Expected array of 3 values, got {rpy} and {xyz}")
         self.rpy = rpy
         self.xyz = xyz
-
-
-# region Geometry and hardcoded ones
-class GeometryType(Enum):
-    MESH = "mesh"
-    CYLINDER = "cylinder"
 
 
 class XYZ(NamedTuple):
@@ -81,13 +67,16 @@ class GeometryBoxModel(Geometry):
 
 @dataclass
 class GeometryCylinderModel(Geometry):
-    radius: float
-    length: float
+    radius: float = 1.0
+    length: float = 1.0
+
+
+GeometryTypes = [MeshModel, GeometryBoxModel, GeometryCylinderModel]
 
 
 @dataclass
 class InertialModel:
-    pose: Pose
+    pose: PoseModel
     mass: float
     inertia: Inertia
 
@@ -114,10 +103,12 @@ class ClassicalMaterialModel(MaterialModel):
 class VisualModel:
     geometry: Geometry
     material: MaterialModel
-    pose: Pose
+    pose: PoseModel
 
 
 # endregion
+
+# region Collision class
 
 
 @dataclass
@@ -128,7 +119,25 @@ class DynamicsModel:
 @dataclass
 class CollisionModel:
     geometry: Geometry
-    pose: Pose
+    pose: PoseModel
+
+
+#endregion
+
+
+@dataclass
+class LinkModel:
+    name: str
+    collision: Optional[CollisionModel]
+    visuals: List[VisualModel]
+    inertial: Optional[InertialModel]
+    pose: PoseModel
+
+    def get_name(self):
+        return self.name
+
+
+# region Joints
 
 
 @dataclass
@@ -140,21 +149,6 @@ class LimitModel:
 
 
 @dataclass
-class LinkModel:
-    name: str
-    collision: CollisionModel
-    visuals: List[VisualModel]
-    inertial: InertialModel
-    pose: Pose
-
-    def get_name(self):
-        return self.name
-
-
-# region Joints
-
-
-@dataclass
 class JointTypeModel(ABC):
     dynamics: DynamicsModel
 
@@ -162,7 +156,7 @@ class JointTypeModel(ABC):
 @dataclass
 class JointModel:
     name: str
-    pose: Pose
+    pose: PoseModel
     parent: LinkModel
     child: LinkModel
     joint_characteristics: JointTypeModel
@@ -190,6 +184,12 @@ class RevoluteJointTypeModel(JointTypeModel):
     limit: LimitModel
 
 
+JointTypeModelAvailable = [
+  FixedJointTypeModel.__name__,
+  PrismaticJointTypeModel.__name__,
+  ContinuousJointTypeModel.__name__,
+  RevoluteJointTypeModel.__name__
+]
 # endregion
 
 
