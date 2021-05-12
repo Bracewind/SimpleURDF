@@ -9,15 +9,15 @@ stages:
   - Build
   - Quality
 
-before_install:
-  - npm install -g pyright
-  - pip install poetry
-  - poetry --version
-install:
-  - poetry install -vv
-
 jobs:
   include:
+    - stage: Build
+      before_install:
+        - npm install -g pyright
+        - pip install poetry
+        - poetry --version
+      install:
+        - poetry install -vv
     - stage: Quality
       name: lint
       script: pylint simpleurdf
