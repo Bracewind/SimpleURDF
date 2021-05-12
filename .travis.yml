@@ -15,13 +15,15 @@ jobs:
       before_install:
         - npm install -g pyright
         - pip install poetry
-        - poetry --version
       install:
         - poetry install -vv
+      script: poetry --version
     - stage: Quality
       name: lint
+      install: pip install pylint
       script: pylint simpleurdf
     - name: type
+      install: npm install -g pyright
       script: pyright simpleurdf
     - name: tests
       script: pytest
