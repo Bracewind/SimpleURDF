@@ -15,7 +15,7 @@ import pytest
 from simpleurdf.urdf2model import Model, Joint, Link
 from simpleurdf import UrdfParser
 
-from simpleUrdfModelExample import RRbot
+from simpleUrdfModelExample import RRbot, Farmbot
 
 from lxml import etree
 
@@ -74,6 +74,7 @@ def test_with_ref_file(robot_in_python: Model, filename_containing_urdf_model):
     (RRbot(), "rrbot.urdf"),
     (ModelInModel().build_model(), "model_in_model.urdf"),
     (Hopper(), "hopper.urdf"),
+    (Farmbot(), "farmbot.urdf"),
   ],
 )
 def test_create_file(model, filename_for_model):

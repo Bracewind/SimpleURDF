@@ -10,8 +10,8 @@ def generate_launch_description():
 
     use_sim_time = LaunchConfiguration("use_sim_time", default="false")
 
-    urdf_file_name = "<model_name>.py"
-    urdf = os.path.join(get_package_share_directory("<model_name>_description"), urdf_file_name)
+    urdf_file_name = "robot_with_link_only.py"
+    urdf = os.path.join(get_package_share_directory("robot_with_link_only_description"), urdf_file_name)
     with open(urdf, "r") as infp:
         robot_desc = infp.read()
 
@@ -32,7 +32,7 @@ def generate_launch_description():
         arguments=[urdf],
       ),
       Node(
-        package="<model>_description",
+        package="robot_with_link_only_description",
         executable="state_publisher",
         name="state_publisher",
         output="screen",

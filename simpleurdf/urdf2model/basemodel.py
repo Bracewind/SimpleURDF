@@ -416,7 +416,10 @@ class Model:
         if self.links_interface == []:
             self.links_interface = [self.root_link]
 
-        self.model = ModelModel(self.name, links, joints, nested_models)
+        self.model = ModelModel(self.name,
+                                links,
+                                joints,
+                                nested_models, {"default": [0. for joint in joints]})
         return self.model
 
 
@@ -429,3 +432,11 @@ class Node(ABC):
 class World:
     def __init__(self, models):
         self.models = models
+
+
+class MoveModel:
+    def __init__(self, model: ModelModel):
+        self.model = model
+
+    def active_joints(self):
+        return [joint for joint in self.model.joints if not isinstance(joint, FixedJointTypeModel)]

@@ -5,7 +5,6 @@ from rclpy.qos import QoSProfile
 from geometry_msgs.msg import Quaternion
 from sensor_msgs.msg import JointState
 from tf2_ros import TransformBroadcaster, TransformStamped
-from .<model_name>_description import <python_model_name>
 
 
 class StatePublisher(Node):
@@ -36,7 +35,12 @@ class StatePublisher(Node):
         odom_trans.child_frame_id = "base_link"
         joint_state = JointState()
 
-        joint_names = 
+        joint_names = [
+            "joint_tracks_gantry",
+            "joint_gantry_crossSlide",
+            "joint_cross_slide_z_axis",
+            "joint_gantry_crossSlide2",
+        ]
         default_position = [0.0, 0.0, 0.0, 0.0]
 
         try:

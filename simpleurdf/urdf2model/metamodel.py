@@ -1,7 +1,7 @@
 #pylint: disable=too-few-public-methods
 
 from abc import ABC
-from typing import List, NamedTuple, Union, Optional
+from typing import List, NamedTuple, Union, Optional, Dict
 from dataclasses import dataclass
 
 MODEL = "model"
@@ -199,3 +199,4 @@ class ModelModel:
     links: List[LinkModel]
     joints: List[JointModel]
     nested_models: List
+    saved_states: Dict[str, List]

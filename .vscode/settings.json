@@ -19,5 +19,12 @@
         "pytest",
         "simpleurdf"
     ],
-    "terminal.integrated.env.linux": {"PYTHONPATH": "${workspaceFolder}"}
+    "terminal.integrated.env.linux": {
+        "PYTHONPATH": "${workspaceFolder}"
+    },
+    "ros.distro": "foxy",
+    "python.autoComplete.extraPaths": [
+        "/opt/ros/foxy/lib/python3.8/site-packages"
+    ],
+    "python.linting.pylintEnabled": true
 }

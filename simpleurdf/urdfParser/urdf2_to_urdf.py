@@ -123,7 +123,7 @@ class Urdf2ToUrdf:
         def default(geometry):
             raise Exception(f"geometryModel not recognized, found {geometry.__class__}")
 
-        assert (len(GeometryTypes) == 3)
+        assert len(GeometryTypes) == 3
         geometry = switch_case(
           shape,
           {
@@ -175,7 +175,7 @@ class Urdf2ToUrdf:
             raise Exception(f"JointType not recognized, found {joint_characteristics.__class__}")
 
         # _used to add to the xml axis and limit if it makes sense for the joint
-        assert (len(JointTypeModelAvailable) == 4)
+        assert len(JointTypeModelAvailable) == 4
         joint_type_related_attributes = switch_case(
           joint.joint_characteristics,
           {
