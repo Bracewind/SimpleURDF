@@ -5,10 +5,23 @@ dist: xenial
 env:
   POETRY_VIRTUALENVS_CREATE: false
 
+stages:
+  - Build
+  - Quality
+
 before_install:
+  - npm install -g pyright
   - pip install poetry
   - poetry --version
 install:
   - poetry install -vv
-script:
-  - pytest
+
+jobs:
+  include:
+    - stage: Quality
+      name: lint
+      script: pylint simpleurdf
+    - name: type
+      script: pyright simpleurdf
+    - name: tests
+      script: pytest

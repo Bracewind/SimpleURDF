@@ -13,10 +13,14 @@
     "python.testing.nosetestsEnabled": false,
     "python.testing.pytestEnabled": true,
     "cSpell.words": [
+        "Rbot",
         "URDF",
+        "VIRTUALENVS",
         "lxml",
         "pylint",
+        "pyright",
         "pytest",
+        "rrbot",
         "simpleurdf"
     ],
     "terminal.integrated.env.linux": {
@@ -26,5 +30,8 @@
     "python.autoComplete.extraPaths": [
         "/opt/ros/foxy/lib/python3.8/site-packages"
     ],
-    "python.linting.pylintEnabled": true
+    "python.linting.pylintEnabled": true,
+    "python.analysis.extraPaths": [
+        "/opt/ros/foxy/lib/python3.8/site-packages"
+    ]
 }
