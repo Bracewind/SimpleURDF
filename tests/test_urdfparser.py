@@ -35,8 +35,7 @@ def test_ok():
     ),
     (RobotWithGeometryForm().build_model(), "robot_with_geometry_form.urdf"),
     (RRbot(), "rrbot.urdf"),
-    (ModelInModel().build_model(), "model_in_model.urdf"),
-    (Hopper(), "hopper.urdf"),
+    (ModelInModel().build_model(), "model_in_model.urdf"),  #(Hopper(), "hopper.urdf"),
   ],
 )
 def test_with_ref_file(robot_in_python: Model, filename_containing_urdf_model):
