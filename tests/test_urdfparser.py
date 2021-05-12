@@ -1,25 +1,20 @@
 import os
-from simpleUrdfModelExample.hopper.hopper import Hopper
-from simpleurdf.urdf2model.metamodel import ModelModel
+import pytest
+from lxml import etree
+
 from tests.reference_model.robot_with_geometry_form import RobotWithGeometryForm
 from tests.reference_model.robot_with_one_fixed_joint import RobotWithOneFixedJoint
 from tests.reference_model.robot_with_link_only import RobotWithLinkOnly
 from tests.reference_model.robot_with_one_revolute_joint import (
   RobotWithOneRevoluteJoint, )
-from tests.reference_model.robot_with_geometry_form import RobotWithGeometryForm
 from tests.reference_model.model_in_model import ModelInModel
-import pytest
 
 #from simpleUrdfModelExample import RRbot
 
-from simpleurdf.urdf2model import Model, Joint, Link
+from simpleurdf.urdf2model import Model
 from simpleurdf import UrdfParser
 
-from simpleUrdfModelExample import RRbot, Farmbot
-
-from lxml import etree
-
-from simpleurdf.urdfParser import urdf
+from simpleUrdfModelExample import RRbot, Farmbot, Hopper
 
 #from simpleUrdfModelExample.hopper.hopper import model
 
