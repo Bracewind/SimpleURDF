@@ -14,13 +14,13 @@ class UrdfParser:
     """class used to load, traverse, and create URDF files"""
     def createURDFString(self, robot: Model) -> str:
         model = robot.build()
-        treeRobot = Urdf2ToUrdf().create_robot(model)
-        return etree.tostring(treeRobot, pretty_print=True, encoding=str)
+        tree_robot = Urdf2ToUrdf().create_robot(model)
+        return etree.tostring(tree_robot, pretty_print=True, encoding=str)
         # world = urdfSerializer.createWorld(world)
         # etree.indent(world)
         # etree.ElementTree(world).write(open(pathToFile, "wb"))
 
     def createURDFFile(self, robot: Model, pathToFile: str):
-        urdfRobot = self.createURDFString(robot)
+        urdf_robot = self.createURDFString(robot)
         with open(pathToFile, "w") as file:
-            file.write(urdfRobot)
+            file.write(urdf_robot)

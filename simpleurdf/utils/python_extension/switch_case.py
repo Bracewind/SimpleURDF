@@ -14,3 +14,4 @@ def switch_case(unknown_type_object: object, all_cases: Dict[Optional[Type], Cal
             if isinstance(unknown_type_object, current_type):
                 return all_cases[current_type](unknown_type_object)
     return all_cases[None](unknown_type_object)
+

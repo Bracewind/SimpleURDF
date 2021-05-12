@@ -6,25 +6,22 @@ env:
   POETRY_VIRTUALENVS_CREATE: false
 
 stages:
-  - Build
   - Quality
 
 jobs:
   include:
-    - stage: Build
-      before_install:
-        - npm install -g pyright
-        - pip install poetry
-      install:
-        - poetry install -vv
-      script: poetry --version
     - stage: Quality
       name: lint
       install: pip install pylint
-      script: pylint simpleurdf
+      script: pylint --disable=missing-class-docstring simpleurdf
     - name: type
+      before_install:
+        - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
       install: npm install -g pyright
-      script: pyright simpleurdf
+      script: pyright
     - name: tests
+      before_install:
+        - npm install -g pyright
+        - pip install poetry
       install: poetry install -vv
       script: pytest

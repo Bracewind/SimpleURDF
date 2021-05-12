@@ -14,7 +14,7 @@ from tests.reference_model.model_in_model import ModelInModel
 from simpleurdf.urdf2model import Model
 from simpleurdf import UrdfParser
 
-from simpleUrdfModelExample import RRbot, Farmbot, Hopper
+from simpleurdf_model_example import RRbot, Farmbot, Hopper
 
 #from simpleUrdfModelExample.hopper.hopper import model
 

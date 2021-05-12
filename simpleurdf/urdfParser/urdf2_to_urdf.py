@@ -16,7 +16,6 @@ from simpleurdf.urdf2model.metamodel import (
   GeometryTypes,
   InertialModel,
   JointModel,
-  JointTypeModel,
   LimitModel,
   LinkModel,
   MaterialModel,
@@ -53,6 +52,8 @@ def _remove_none_value(list_with_none):
 
 
 class Urdf2ToUrdf:
+    """This class builds a string containing a urdf definition of a robot
+    defined using the urdf2 specification"""
     URDF_TYPE_JOINT_MAPPING = cast(
       Dict[Optional[Type], Callable[[JointModel], str]],
       {

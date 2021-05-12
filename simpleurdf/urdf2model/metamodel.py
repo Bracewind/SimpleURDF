@@ -118,6 +118,7 @@ class DynamicsModel:
 
 @dataclass
 class CollisionModel:
+    """representation of collision object in URDF2"""
     geometry: Geometry
     pose: PoseModel
 
@@ -127,6 +128,7 @@ class CollisionModel:
 
 @dataclass
 class LinkModel:
+    """representation of a link in URDF2"""
     name: str
     collision: Optional[CollisionModel]
     visuals: List[VisualModel]
@@ -142,6 +144,7 @@ class LinkModel:
 
 @dataclass
 class LimitModel:
+    """limit used by prismatic and revolute joint type"""
     lower: float
     upper: float
     effort: float
@@ -150,11 +153,13 @@ class LimitModel:
 
 @dataclass
 class JointTypeModel(ABC):
+    """generic class from which each joint type derive"""
     dynamics: DynamicsModel
 
 
 @dataclass
 class JointModel:
+    """class representing a Joint in URDF2"""
     name: str
     pose: PoseModel
     parent: LinkModel
@@ -164,22 +169,29 @@ class JointModel:
 
 @dataclass
 class FixedJointTypeModel(JointTypeModel):
-    pass
+    """joint type representing a fixed joint between two bodies"""
 
 
 @dataclass
 class PrismaticJointTypeModel(JointTypeModel):
+    """joint type representing a joint moving along
+    a translation axis"""
     translation_axis: XYZ
     limit: LimitModel
 
 
 @dataclass
 class ContinuousJointTypeModel(JointTypeModel):
+    """joint type representing a joint without limit such
+    as a wheel"""
     rotation_axis: XYZ
 
 
 @dataclass
 class RevoluteJointTypeModel(JointTypeModel):
+    """joint type representing a revolute joint, i.e a one degree of freedom joint
+    rotating around the given rotation_axis. Classically, this joint cannot go above
+    pi and -pi, and controlled with a PID"""
     rotation_axis: XYZ
     limit: LimitModel
 
@@ -195,6 +207,7 @@ JointTypeModelAvailable = [
 
 @dataclass
 class ModelModel:
+    """class representing a model in URDF2"""
     name: str
     links: List[LinkModel]
     joints: List[JointModel]
