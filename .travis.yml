@@ -26,4 +26,5 @@ jobs:
       install: npm install -g pyright
       script: pyright simpleurdf
     - name: tests
+      install: poetry install -vv
       script: pytest
