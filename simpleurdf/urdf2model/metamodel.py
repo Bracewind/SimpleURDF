@@ -1,6 +1,7 @@
+#pylint: disable=too-few-public-methods
+
 from abc import ABC
-from enum import Enum
-from typing import List, NamedTuple, Union
+from typing import List, NamedTuple, Union, Optional, Dict
 from dataclasses import dataclass
 
 MODEL = "model"
@@ -8,27 +9,12 @@ LINK = "link"
 JOINT = "joint"
 
 
-class MetamodelComponent:
-    def __init__(self, urdf2_type):
-        self.urdf2type = urdf2_type
-
-    @property
-    def urdf2_type(self):
-        return self.urdf2type.__name__
-
-
-class Pose:
-    def __init__(self, rpy=[0, 0, 0], xyz=[0, 0, 0]):
+class PoseModel:
+    def __init__(self, rpy, xyz):
         if len(rpy) != 3 or len(xyz) != 3:
             raise Exception(f"Expected array of 3 values, got {rpy} and {xyz}")
         self.rpy = rpy
         self.xyz = xyz
-
-
-# region Geometry and hardcoded ones
-class GeometryType(Enum):
-    MESH = "mesh"
-    CYLINDER = "cylinder"
 
 
 class XYZ(NamedTuple):
@@ -81,13 +67,16 @@ class GeometryBoxModel(Geometry):
 
 @dataclass
 class GeometryCylinderModel(Geometry):
-    radius: float
-    length: float
+    radius: float = 1.0
+    length: float = 1.0
+
+
+GeometryTypes = [MeshModel, GeometryBoxModel, GeometryCylinderModel]
 
 
 @dataclass
 class InertialModel:
-    pose: Pose
+    pose: PoseModel
     mass: float
     inertia: Inertia
 
@@ -114,10 +103,12 @@ class ClassicalMaterialModel(MaterialModel):
 class VisualModel:
     geometry: Geometry
     material: MaterialModel
-    pose: Pose
+    pose: PoseModel
 
 
 # endregion
+
+# region Collision class
 
 
 @dataclass
@@ -127,25 +118,22 @@ class DynamicsModel:
 
 @dataclass
 class CollisionModel:
+    """representation of collision object in URDF2"""
     geometry: Geometry
-    pose: Pose
+    pose: PoseModel
 
 
-@dataclass
-class LimitModel:
-    lower: float
-    upper: float
-    effort: float
-    velocity: float
+#endregion
 
 
 @dataclass
 class LinkModel:
+    """representation of a link in URDF2"""
     name: str
-    collision: CollisionModel
+    collision: Optional[CollisionModel]
     visuals: List[VisualModel]
-    inertial: InertialModel
-    pose: Pose
+    inertial: Optional[InertialModel]
+    pose: PoseModel
 
     def get_name(self):
         return self.name
@@ -155,14 +143,25 @@ class LinkModel:
 
 
 @dataclass
+class LimitModel:
+    """limit used by prismatic and revolute joint type"""
+    lower: float
+    upper: float
+    effort: float
+    velocity: float
+
+
+@dataclass
 class JointTypeModel(ABC):
+    """generic class from which each joint type derive"""
     dynamics: DynamicsModel
 
 
 @dataclass
 class JointModel:
+    """class representing a Joint in URDF2"""
     name: str
-    pose: Pose
+    pose: PoseModel
     parent: LinkModel
     child: LinkModel
     joint_characteristics: JointTypeModel
@@ -170,32 +169,47 @@ class JointModel:
 
 @dataclass
 class FixedJointTypeModel(JointTypeModel):
-    pass
+    """joint type representing a fixed joint between two bodies"""
 
 
 @dataclass
 class PrismaticJointTypeModel(JointTypeModel):
+    """joint type representing a joint moving along
+    a translation axis"""
     translation_axis: XYZ
     limit: LimitModel
 
 
 @dataclass
 class ContinuousJointTypeModel(JointTypeModel):
+    """joint type representing a joint without limit such
+    as a wheel"""
     rotation_axis: XYZ
 
 
 @dataclass
 class RevoluteJointTypeModel(JointTypeModel):
+    """joint type representing a revolute joint, i.e a one degree of freedom joint
+    rotating around the given rotation_axis. Classically, this joint cannot go above
+    pi and -pi, and controlled with a PID"""
     rotation_axis: XYZ
     limit: LimitModel
 
 
+JointTypeModelAvailable = [
+  FixedJointTypeModel.__name__,
+  PrismaticJointTypeModel.__name__,
+  ContinuousJointTypeModel.__name__,
+  RevoluteJointTypeModel.__name__
+]
 # endregion
 
 
 @dataclass
 class ModelModel:
+    """class representing a model in URDF2"""
     name: str
     links: List[LinkModel]
     joints: List[JointModel]
     nested_models: List
+    saved_states: Dict[str, List]

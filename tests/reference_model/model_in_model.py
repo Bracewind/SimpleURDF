@@ -1,13 +1,10 @@
-from simpleurdf.urdf2model.metamodel import DynamicsModel, ModelModel
+from simpleurdf.urdf2model.metamodel import DynamicsModel
 from simpleurdf.urdf2model import (
   Box,
   Cylinder,
   FixedJointType,
-  GeometryBox,
   Joint,
-  Limit,
   MaterialColor,
-  RevoluteJointType,
 )
 from simpleurdf.urdf2model import UrdfFactory
 from simpleurdf.urdf2model import Model

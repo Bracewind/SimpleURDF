@@ -1,0 +1,79 @@
+<robot name="Farmbot">
+  <link name="base_link"/>
+  <link name="raised_bed">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://urdf_tutorial/meshes/raised_bed.dae" scale="1 1 1"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+  </link>
+  <link name="Tracks">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://urdf_tutorial/meshes/tracks.dae" scale="1 1 1"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+  </link>
+  <link name="gantry">
+    <visual>
+      <origin rpy="0 0 0" xyz="0.75 0 0.6"/>
+      <geometry>
+        <mesh filename="package://urdf_tutorial/meshes/gantry.dae" scale="1 1 1"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+  </link>
+  <link name="cross_slide">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://urdf_tutorial/meshes/cross_slide.dae" scale="1 1 1"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+  </link>
+  <link name="z_axis">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://urdf_tutorial/meshes/z_axis.dae" scale="1 1 1"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+  </link>
+  <joint name="base_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="raised_bed"/>
+  </joint>
+  <joint name="joint_raisedbed_tracks" type="fixed">
+    <origin rpy="0 0 1.5707963267948966" xyz="0.75 -0.19 0.15"/>
+    <parent link="raised_bed"/>
+    <child link="Tracks"/>
+  </joint>
+  <joint name="joint_tracks_gantry" type="prismatic">
+    <axis xyz="1 0 0"/>
+    <limit lower="-inf" upper="inf" effort="-1" velocity="inf"/>
+    <origin rpy="0 0 1.5707963267948966" xyz="-1.31 0 0.15"/>
+    <parent link="Tracks"/>
+    <child link="gantry"/>
+  </joint>
+  <joint name="joint_gantry_crossslide" type="prismatic">
+    <axis xyz="1 0 0"/>
+    <limit lower="-inf" upper="inf" effort="-1" velocity="inf"/>
+    <origin rpy="0 0 0" xyz="0 0 0.6"/>
+    <parent link="gantry"/>
+    <child link="cross_slide"/>
+  </joint>
+  <joint name="joint_crossslide_zaxis" type="prismatic">
+    <axis xyz="0 0 1"/>
+    <limit lower="-inf" upper="inf" effort="-1" velocity="inf"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="cross_slide"/>
+    <child link="z_axis"/>
+  </joint>
+</robot>

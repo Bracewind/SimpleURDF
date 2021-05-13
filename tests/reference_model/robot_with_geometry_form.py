@@ -1,13 +1,10 @@
-from simpleurdf.urdf2model.metamodel import DynamicsModel, ModelModel
+from simpleurdf.urdf2model.metamodel import DynamicsModel
 from simpleurdf.urdf2model import (
   Box,
   Cylinder,
   FixedJointType,
-  GeometryBox,
   Joint,
-  Limit,
   MaterialColor,
-  RevoluteJointType,
 )
 from simpleurdf.urdf2model import UrdfFactory
 from simpleurdf.urdf2model import Model
@@ -27,8 +24,7 @@ class RobotWithGeometryForm(UrdfFactory):
             joints=[
               Joint(
                 name="fixed_joint",
-                joint_type_characteristics=FixedJointType(
-                  dynamics=DynamicsModel(1)),
+                joint_type_characteristics=FixedJointType(dynamics=DynamicsModel(1)),
                 child=Cylinder(
                   name="link2",
                   radius=0.5,

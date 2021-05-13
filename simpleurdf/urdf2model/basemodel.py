@@ -1,9 +1,12 @@
+#pylint: disable=too-few-public-methods, too-many-arguments
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import List, Optional, Union, Tuple, cast
 import math
+from copy import deepcopy
 
-from simpleurdf.utils.python_extension import switch_case, case
+from simpleurdf.utils.python_extension import switch_case
+from simpleurdf.utils.python_extension.deepcopy_attribute import init_with_deepcopy
 
 from .metamodel import (
   ClassicalMaterialModel,
@@ -22,14 +25,14 @@ from .metamodel import (
   LinkModel,
   MeshModel,
   ModelModel,
-  Pose,
+  PoseModel,
+  PrismaticJointTypeModel,
   RevoluteJointTypeModel,
   VisualModel,
   XYZ,
 )
 
-PARENT = "parent"
-ROOT = "root"
+DEFAULT_BEHAVIOR = None
 
 LOWER_LIMIT = -math.inf
 UPPER_LIMIT = math.inf
@@ -38,12 +41,21 @@ NO_EFFORT = -1
 NO_VELOCITY_LIMIT = math.inf
 
 
+class Pose(PoseModel):
+    """builder for pose object"""
+    @init_with_deepcopy
+    def __init__(self, rpy=[0, 0, 0], xyz=[0, 0, 0]):  #pylint: disable=dangerous-default-value
+        super().__init__(rpy, xyz)
+
+
 class Mesh(MeshModel):
+    @init_with_deepcopy
     def __init__(self, uri, scale: XYZ = XYZ(1.0, 1.0, 1.0)):
         super().__init__(uri, scale)
 
 
 class GeometryBox(GeometryBoxModel):
+    @init_with_deepcopy
     def __init__(self, size: XYZ = XYZ(1.0, 1.0, 1.0)):
         super().__init__(size)
 
@@ -60,16 +72,15 @@ class Sphere:
 
 
 class GeometryCylinder(GeometryCylinderModel):
-    def __init__(self, radius: float = 1.0, length: float = 1.0):
-        super().__init__(radius, length)
+    pass
 
 
 class Inertial(InertialModel):
-    def __init__(self, pose: Pose, mass: float, inertia: Inertia) -> None:
-        super().__init__(pose, mass, inertia)
+    pass
 
 
 class InertialCylinder(Inertial):
+    @init_with_deepcopy
     def __init__(self,
                  radius: float = 1.0,
                  length: float = 1.0,
@@ -83,6 +94,7 @@ class InertialCylinder(Inertial):
 
 
 class InertialBox(Inertial):
+    @init_with_deepcopy
     def __init__(self,
                  size: XYZ = XYZ(1.0, 1.0, 1.0),
                  pose: Pose = Pose(),
@@ -99,7 +111,8 @@ DEFAULT_INERTIAL = Inertial(Pose(), 1, Inertia(1, 0, 0, 1, 0, 1))
 
 
 class MaterialColor(ClassicalMaterialModel):
-    def __init__(
+    @init_with_deepcopy
+    def __init__(  #pylint: disable=dangerous-default-value
       self,
       name,
       ambient=[0, 0, 0, 0],
@@ -114,16 +127,19 @@ white = MaterialColor(name="white", ambient=[0, 0, 0, 1])
 
 
 class Visual(VisualModel):
-    def __init__(self, geometry: Geometry, pose=Pose(), material=white, parent_frame=PARENT):
+    @init_with_deepcopy
+    def __init__(self, geometry: Geometry, pose=Pose(), material=white):
         super().__init__(geometry, material, pose)
 
 
 class Collision(CollisionModel):
+    @init_with_deepcopy
     def __init__(self, geometry, pose=Pose()) -> None:
         super().__init__(geometry, pose)
 
 
 class CollisionBox(Collision):
+    @init_with_deepcopy
     def __init__(self, geometry, pose) -> None:
         super().__init__(geometry, pose=pose)
 
@@ -148,20 +164,31 @@ class Dynamics(DynamicsModel):
 
 
 class Link:
-    def __init__(
+    """Builder for LinkModel"""
+    @init_with_deepcopy
+    def __init__(  #pylint: disable=dangerous-default-value
       self,
       name: str,
-      collision=None,
+      collision: Optional[Collision] = None,
       visuals: List[VisualModel] = [],
-      inertial=None,
+      inertial: Optional[Inertial] = None,
       joints: List[Joint] = [],
       pose: Pose = Pose(),
-      parent_frame=PARENT,
     ):
+        """if collision and inertial are None, they will not be specified in the model,
+        and any tools requiring them are expected to throw an error for this model"""
+
+        if visuals == []:
+            visuals = deepcopy(visuals)
+        if joints == []:
+            joints = deepcopy(joints)
+
         self.link_model = LinkModel(name, collision, visuals, inertial, pose)
         self.joints = joints
         for joint in self.joints:
             joint.set_parent(self)
+
+        self.parent_node = None
 
     def set_parent(self, parent):
         self.parent_node = parent
@@ -172,8 +199,8 @@ class Link:
 
 
 class Cylinder(Link):
-    """ """
-    def __init__(
+    @init_with_deepcopy
+    def __init__(  #pylint: disable=dangerous-default-value
       self,
       name,
       radius: float,
@@ -181,8 +208,12 @@ class Cylinder(Link):
       mass: float = 1,
       joints: List[Joint] = [],
       pose=Pose(),
-      collision_pose: Optional[Pose] = None,
+      collision_pose: Optional[Pose] = DEFAULT_BEHAVIOR,
     ):
+        """
+        if collision_pose value is DEFAULT_BEHAVIOR it is the same as the pose value specified
+        """
+        """Do not modify joints without making a deepcopy !!!"""  #pylint: disable=pointless-string-statement
 
         self._name = name
         self._radius = float(radius)
@@ -205,7 +236,8 @@ class Cylinder(Link):
 
 
 class Box(Link):
-    def __init__(
+    @init_with_deepcopy
+    def __init__(  #pylint: disable=dangerous-default-value
       self,
       name,
       material,
@@ -215,8 +247,12 @@ class Box(Link):
       mass: float = 1.0,
       joints: List[Joint] = [],
       pose=Pose(),
-      collision_pose: Optional[Pose] = None,
+      collision_pose: Optional[Pose] = DEFAULT_BEHAVIOR,
     ):
+        """
+        if collision_pose value is DEFAULT_BEHAVIOR, it is the same as the pose value specified
+        """
+        """Do not modify joints without making a deepcopy !!!"""  #pylint: disable=pointless-string-statement
 
         self._name = name
         self._size = XYZ(float(width), float(height), float(depth))
@@ -231,7 +267,9 @@ class Box(Link):
             collision = Collision(GeometryBox(self._size), pose)
 
         # create visuals
-        visuals: List[VisualModel] = [Visual(GeometryBox(self._size), self._pose)]
+        visuals: List[VisualModel] = [
+          Visual(GeometryBox(self._size), self._pose, material=material)
+        ]
 
         # create inertials
         inertial = InertialBox(self._size, self._pose, self._mass)
@@ -251,6 +289,7 @@ class JointType(ABC):
 
 
 class FixedJointType(JointType):
+    @init_with_deepcopy
     def __init__(self, dynamics: DynamicsModel) -> None:
         self.joint_type = FixedJointTypeModel(dynamics)
 
@@ -258,18 +297,45 @@ class FixedJointType(JointType):
         return self.joint_type
 
 
+class PrismaticJointType(JointType):
+    @init_with_deepcopy
+    def __init__(  #pylint: disable=dangerous-default-value
+      self,
+      translation_axis,
+      limit=Limit(),
+    ) -> None:
+        super().__init__()
+        self.joint_type = PrismaticJointTypeModel(DynamicsModel(1),
+                                                  translation_axis=translation_axis,
+                                                  limit=deepcopy(limit))
+
+    def build(self) -> PrismaticJointTypeModel:
+        return self.joint_type
+
+
 class ContinuousJointType(JointType):
-    def __init__(self, rotation_axis: XYZ, joint_physic=Dynamics()):
-        self.joint_type = ContinuousJointTypeModel(joint_physic, rotation_axis)
+    @init_with_deepcopy
+    def __init__(  #pylint: disable=dangerous-default-value
+      self,
+      rotation_axis: XYZ,
+      joint_physic=Dynamics(),
+    ):
+        self.joint_type = ContinuousJointTypeModel(deepcopy(joint_physic), rotation_axis)
 
     def build(self) -> ContinuousJointTypeModel:
         return self.joint_type
 
 
 class RevoluteJointType(JointType):
-    def __init__(self, rotation_axis: XYZ, limit: LimitModel, joint_physic=Dynamics()):
+    @init_with_deepcopy
+    def __init__(  #pylint: disable=dangerous-default-value
+      self,
+      rotation_axis: XYZ,
+      limit: LimitModel,
+      joint_physic=Dynamics(),
+    ):
         self.joint_type = RevoluteJointTypeModel(
-          joint_physic,
+          deepcopy(joint_physic),
           rotation_axis,
           limit,
         )
@@ -279,16 +345,16 @@ class RevoluteJointType(JointType):
 
 
 class Joint:
-    def __init__(
+    @init_with_deepcopy
+    def __init__(  #pylint: disable=dangerous-default-value
       self,
       name: str,
       child: Union[Tuple[Model, int], Link],
       joint_type_characteristics: JointType,
       pose=Pose(),
-      parent_frame=PARENT,
     ):
         self._name_param = name
-        self._pose_param = pose
+        self._pose_param = deepcopy(pose)
         self.child_node = child
         self._joint_type_characteristics_param = joint_type_characteristics
         self.parent_node = None
@@ -319,7 +385,7 @@ class Joint:
         child_model_or_link = self.child_node
         if isinstance(self.child_node, tuple):
             child_model_or_link = self.child_node[0]
-        assert (isinstance(child_model_or_link, Model) or isinstance(child_model_or_link, Link))
+        assert isinstance(child_model_or_link, (Link, Model))
         child_model_or_link.build()
         joint_type_characteristics = self._joint_type_characteristics_param.build()
 
@@ -337,19 +403,27 @@ class Joint:
 
 
 class Model:
-    def __init__(self, name: str, root_link: Link, linksInterface: List[Link] = [], pose=Pose()):
+    @init_with_deepcopy
+    def __init__(  #pylint: disable=dangerous-default-value
+      self,
+      name: str,
+      root_link: Link,
+      linksInterface: List[Link] = [],
+      pose=Pose(),
+    ):
 
         self.name = name
         self.root_link = root_link
         self.links_interface = linksInterface
         self.pose = pose
         self.model = None
+        self.parent_node = None
 
     def get_link(self, interface_nb: int):
         return self.links_interface[interface_nb]
 
     def set_parent(self, parent):
-        self._parent_node = parent
+        self.parent_node = parent
 
     def build(self) -> ModelModel:
         self.root_link.build()
@@ -359,7 +433,7 @@ class Model:
         nested_models: List[ModelModel] = []
 
         def next_model(model: Tuple[Model, int]) -> None:
-            assert (model[0].model is not None)
+            assert model[0].model is not None
             nested_models.append(model[0].model)
 
         def next_joint(joint: Joint) -> None:
@@ -375,11 +449,15 @@ class Model:
 
         next_link(self.root_link)
 
-        # if no links were given, we supposed that the model is a tree and that the root_link is an interface
+        # if no links were given, we supposed that the model is a tree
+        # and that the root_link is an interface
         if self.links_interface == []:
             self.links_interface = [self.root_link]
 
-        self.model = ModelModel(self.name, links, joints, nested_models)
+        self.model = ModelModel(self.name,
+                                links,
+                                joints,
+                                nested_models, {"default": [0. for joint in joints]})
         return self.model
 
 
@@ -392,3 +470,11 @@ class Node(ABC):
 class World:
     def __init__(self, models):
         self.models = models
+
+
+class MoveModel:
+    def __init__(self, model: ModelModel):
+        self.model = model
+
+    def active_joints(self):
+        return [joint for joint in self.model.joints if not isinstance(joint, FixedJointTypeModel)]

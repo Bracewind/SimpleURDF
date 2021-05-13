@@ -1,0 +1,32 @@
+language: python
+python: "3.9"
+dist: xenial
+
+#env:
+#  POETRY_VIRTUALENVS_CREATE: false
+
+stages:
+  - Quality
+
+jobs:
+  include:
+    - stage: Quality
+      name: lint
+      install: 
+        - pip install pylint
+      script: pylint --disable=missing-class-docstring,no-self-use,import-error simpleurdf
+    - name: type
+      before_install:
+        - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+        - nvm install node
+        - pip install poetry
+      install: 
+        - npm install -g pyright
+        - poetry install -vv
+      script: pyright
+    - name: tests
+      before_install:
+        - npm install -g pyright
+        - pip install poetry
+      install: poetry install -vv
+      script: pytest

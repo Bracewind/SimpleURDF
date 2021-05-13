@@ -1,12 +1,7 @@
-from simpleurdf.urdf2model.basemodel import (FixedJointType,
-                                             Joint,
-                                             Limit,
-                                             RevoluteJointType,
-                                             XYZ)
-from simpleurdf.urdf2model import UrdfFactory
-from simpleurdf.urdf2model import ModelModel, Model, Link
-
 import math
+from simpleurdf.urdf2model.basemodel import (Joint, Limit, RevoluteJointType, XYZ)
+from simpleurdf.urdf2model import UrdfFactory
+from simpleurdf.urdf2model import Model, Link
 
 
 class RobotWithOneRevoluteJoint(UrdfFactory):
