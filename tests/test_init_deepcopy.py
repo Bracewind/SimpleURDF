@@ -1,5 +1,4 @@
 from typing import List
-import lust
 from simpleurdf.utils.python_extension.deepcopy_attribute import init_with_deepcopy
 
 

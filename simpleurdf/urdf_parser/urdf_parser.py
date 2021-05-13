@@ -20,7 +20,7 @@ class UrdfParser:
         # etree.indent(world)
         # etree.ElementTree(world).write(open(pathToFile, "wb"))
 
-    def create_urdf_file(self, robot: Model, pathToFile: str):
+    def create_urdf_file(self, robot: Model, path_to_file: str):
         urdf_robot = self.create_urdf_string(robot)
-        with open(pathToFile, "w") as file:
+        with open(path_to_file, "w") as file:
             file.write(urdf_robot)
