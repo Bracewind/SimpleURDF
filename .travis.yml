@@ -12,18 +12,17 @@ jobs:
   include:
     - stage: Quality
       name: lint
-      before_install:
-        - npm install -g pyright
-        - pip install poetry
       install: 
-        - poetry install -vv
         - pip install pylint
-      script: pylint --disable=missing-class-docstring,no-self-use simpleurdf
+      script: pylint --disable=missing-class-docstring,no-self-use,import-error simpleurdf
     - name: type
       before_install:
         - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
         - nvm install node
-      install: npm install -g pyright
+        - pip install poetry
+      install: 
+        - npm install -g pyright
+        - poetry install -vv
       script: pyright
     - name: tests
       before_install:

@@ -12,7 +12,7 @@ from .urdf2_to_urdf import Urdf2ToUrdf
 
 class UrdfParser:
     """class used to load, traverse, and create URDF files"""
-    def createURDFString(self, robot: Model) -> str:
+    def create_urdf_string(self, robot: Model) -> str:
         model = robot.build()
         tree_robot = Urdf2ToUrdf().create_robot(model)
         return etree.tostring(tree_robot, pretty_print=True, encoding=str)
@@ -20,7 +20,7 @@ class UrdfParser:
         # etree.indent(world)
         # etree.ElementTree(world).write(open(pathToFile, "wb"))
 
-    def createURDFFile(self, robot: Model, pathToFile: str):
-        urdf_robot = self.createURDFString(robot)
+    def create_urdf_file(self, robot: Model, pathToFile: str):
+        urdf_robot = self.create_urdf_string(robot)
         with open(pathToFile, "w") as file:
             file.write(urdf_robot)

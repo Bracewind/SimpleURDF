@@ -43,16 +43,16 @@ def test_with_ref_file(robot_in_python: Model, filename_containing_urdf_model):
     filename_containing_urdf_model is the file containing the representation of the robot in urdf"""
 
     parser = UrdfParser()
-    urdfRepr = parser.createURDFString(robot_in_python)
+    urdf_repr = parser.create_urdf_string(robot_in_python)
 
     current_path = os.getcwd()
     path_to_ref_model_from_module = os.path.join(current_path, "tests", "reference_model")
 
     complete_path = os.path.join(path_to_ref_model_from_module, filename_containing_urdf_model)
-    with open(complete_path, "r") as f:
-        urdf_robot_repr = etree.parse(f)
+    with open(complete_path, "r") as file:
+        urdf_robot_repr = etree.parse(file)
         urdf_robot_linted = etree.tostring(urdf_robot_repr, pretty_print=True, encoding=str)
-        assert urdf_robot_linted == urdfRepr
+        assert urdf_robot_linted == urdf_repr
 
 
 @pytest.mark.parametrize(
@@ -74,5 +74,5 @@ def test_with_ref_file(robot_in_python: Model, filename_containing_urdf_model):
 def test_create_file(model, filename_for_model):
     broker = UrdfParser()
     path = os.getcwd()
-    pathToFile = os.path.join(path, "tests", "model_generated", filename_for_model)
-    broker.createURDFFile(model, pathToFile)
+    path_to_file = os.path.join(path, "tests", "model_generated", filename_for_model)
+    broker.create_urdf_file(model, path_to_file)
