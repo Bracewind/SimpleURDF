@@ -1,5 +1,6 @@
 # Byte-compiled / optimized / DLL files
-__pycache__/
+__pycache__/*
+simpleurdf/.mypy_cache
 *.py[cod]
 
 # C extensions

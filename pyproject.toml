@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "simpleurdf"
 version = "0.1.0"
-description = ""
-authors = ["Bracewind <gregoire.pichereau@gmail.com>"]
+description = "hello world"
+authors = ["Bracewind <greg.pichereau@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"

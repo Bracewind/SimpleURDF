@@ -1,6 +1,5 @@
 {
     "restructuredtext.confPath": "",
-    "python.pythonPath": "venv/simpleurdf-N0_-Sw1X-py3.8/bin/python3",
     "python.testing.pytestArgs": [
         "tests"
     ],
@@ -27,11 +26,7 @@
         "PYTHONPATH": "${workspaceFolder}"
     },
     "ros.distro": "foxy",
-    "python.autoComplete.extraPaths": [
-        "/opt/ros/foxy/lib/python3.8/site-packages"
-    ],
     "python.linting.pylintEnabled": true,
-    "python.analysis.extraPaths": [
-        "/opt/ros/foxy/lib/python3.8/site-packages"
-    ]
+    "python.languageServer": "Default",
+    "python.pythonPath": "venv/simpleurdf-N0_-Sw1X-py3.8/bin/python3"
 }

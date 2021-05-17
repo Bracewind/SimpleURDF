@@ -1,5 +1,3 @@
-
-
 class NodeTree:
     pass
 
@@ -24,7 +22,6 @@ class Attribute(NodeTree):
 
 class FileGenerator:
     def createAST(self, objectToAnalyze, listDuplicatedObject):
-
         def errorEncountered(element):
             raise Exception("Dictionnary not supported")
 
@@ -35,11 +32,11 @@ class FileGenerator:
             return listToken
 
         switcher = {
-            int: lambda element: element,
-            float: lambda element: element,
-            list: lambda element: createChildrenAST(element),
-            dict: errorEncountered,
-            str: lambda element: element,
+          int: lambda element: element,
+          float: lambda element: element,
+          list: lambda element: createChildrenAST(element),
+          dict: errorEncountered,
+          str: lambda element: element,
         }
         if objectToAnalyze.__class__ in switcher:
             return switcher[objectToAnalyze.__class__](objectToAnalyze)
@@ -47,17 +44,12 @@ class FileGenerator:
             listChildren = []
             attributes = objectToAnalyze.__dict__.keys()
             for attribute in attributes:
-                childAST = self.createAST(
-                    objectToAnalyze.__dict__[attribute], listDuplicatedObject)
+                childAST = self.createAST(objectToAnalyze.__dict__[attribute], listDuplicatedObject)
                 if childAST != [] and childAST != None:
-                    listChildren.append(Attribute(
-                        attribute,
-                        childAST
-                    ))
+                    listChildren.append(Attribute(attribute, childAST))
             return ClassToken(objectToAnalyze, listChildren)
 
     def createStringFromAST(self, pythonObject) -> str:
-
         def createStringForInstance(instance: ClassToken) -> str:
             stringRepr = instance.instance.__class__.__name__ + "("
             for attribute in instance.children:
@@ -85,12 +77,12 @@ class FileGenerator:
             return duplicatedInstance.nameInstance
 
         switcher = {
-            int: createStringForNumeric,
-            float: createStringForNumeric,
-            list: createStringForList,
-            str: createStringForString,
-            DuplicatedInstance: createStringForDuplicated,
-            Attribute: createStringForAttribute,
+          int: createStringForNumeric,
+          float: createStringForNumeric,
+          list: createStringForList,
+          str: createStringForString,
+          DuplicatedInstance: createStringForDuplicated,
+          Attribute: createStringForAttribute,
         }
         if pythonObject.__class__ in switcher:
             return switcher[pythonObject.__class__](pythonObject)
