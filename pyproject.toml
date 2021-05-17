@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "simpleurdf"
-version = "0.1.01"
+version = "0.1.112"
 description = "hello world"
 authors = ["Bracewind <greg.pichereau@gmail.com>"]
 

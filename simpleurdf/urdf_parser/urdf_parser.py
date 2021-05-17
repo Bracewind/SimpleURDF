@@ -1,6 +1,7 @@
 # from .URDFRepresentation import URDFRepresentation
 # from .UrdfToUrdf2 import UrdfToUrdf2
 
+import os
 from lxml import etree
 
 from simpleurdf.urdf2model import Model
@@ -22,5 +23,7 @@ class UrdfParser:
 
     def create_urdf_file(self, robot: Model, path_to_file: str):
         urdf_robot = self.create_urdf_string(robot)
-        with open(path_to_file, "w") as file:
+        path_to_directory, _ = os.path.split(path_to_file)
+        os.makedirs(path_to_directory, exist_ok=True)
+        with open(path_to_file, "w+") as file:
             file.write(urdf_robot)
