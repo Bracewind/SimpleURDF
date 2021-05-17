@@ -3,20 +3,20 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="3 2 2"/>
+        <box size="2 2 3"/>
       </geometry>
     </collision>
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size="3 2 2"/>
+        <box size="2 2 3"/>
       </geometry>
       <material name="red"/>
     </visual>
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <mass value="10"/>
-      <inertia ixx="6.66667" ixy="0" ixz="0" iyy="10.8333" iyz="0" izz="10.8333"/>
+      <inertia ixx="10.8333" ixy="0" ixz="0" iyy="10.8333" iyz="0" izz="6.66667"/>
     </inertial>
   </link>
   <link name="link2">

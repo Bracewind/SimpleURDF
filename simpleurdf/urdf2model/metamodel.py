@@ -62,6 +62,7 @@ class MeshModel(Geometry):
 
 @dataclass
 class GeometryBoxModel(Geometry):
+    """size = [depth, height, width]"""
     size: XYZ
 
 

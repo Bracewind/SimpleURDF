@@ -146,8 +146,8 @@ class Urdf2ToUrdf:
         return self.em.mesh({"filename": path, "scale": f"{x_scale:g} {y_scale:g} {z_scale:g}"})
 
     def create_box(self, shape: GeometryBoxModel):
-        width, depth, length = shape.size
-        return self.em.box({"size": f"{width:g} {depth:g} {length:g}"})
+        depth, length, width = shape.size
+        return self.em.box({"size": f"{depth:g} {length:g} {width:g}"})
 
     def create_cylinder(self, shape: GeometryCylinderModel):
         return self.em.cylinder({"radius": str(shape.radius), "length": str(shape.length)})

@@ -3,7 +3,7 @@ from simpleurdf import UrdfParser
 
 
 def test_version():
-    assert __version__ == "0.1.112"
+    assert __version__ == "0.1.113"
 
 
 def test_loading_file():

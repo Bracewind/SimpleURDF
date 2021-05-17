@@ -255,7 +255,7 @@ class Box(Link):
         """Do not modify joints without making a deepcopy !!!"""  #pylint: disable=pointless-string-statement
 
         self._name = name
-        self._size = XYZ(float(width), float(height), float(depth))
+        self._size = XYZ(float(depth), float(height), float(width))
         self._mass = float(mass)
         self._pose = pose
 

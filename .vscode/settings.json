@@ -28,5 +28,8 @@
     "ros.distro": "foxy",
     "python.linting.pylintEnabled": true,
     "python.languageServer": "Default",
-    "python.pythonPath": "venv/simpleurdf-N0_-Sw1X-py3.8/bin/python3"
+    "python.pythonPath": "venv/simpleurdf-N0_-Sw1X-py3.8/bin/python3",
+    "python.autoComplete.extraPaths": [
+        "/opt/ros/foxy/lib/python3.8/site-packages"
+    ]
 }
